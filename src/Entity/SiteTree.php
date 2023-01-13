@@ -22,29 +22,32 @@ class SiteTree extends BaseEntity
     use Id;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, fetch: 'EAGER')]
-    #[ORM\OrderBy(['lft' => Criteria::ASC])]
+    #[ORM\OrderBy(['left' => Criteria::ASC])]
     private Collection $children;
 
     #[Gedmo\TreeParent]
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
-    #[ORM\JoinColumn(referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER', inversedBy: 'children')]
+    #[ORM\JoinColumn(referencedColumnName: 'id')]
     private ?SiteTree $parent = null;
 
-    #[Gedmo\TreeLevel]
     #[ORM\Column(nullable: false)]
-    private int $lvl;
+    private ?string $type = null;
+
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(name: 'lvl', nullable: false)]
+    private int $level;
 
     #[Gedmo\TreeLeft]
-    #[ORM\Column(nullable: false)]
-    private int $lft;
+    #[ORM\Column(name: 'lft', nullable: false)]
+    private int $left;
 
     #[Gedmo\TreeRight]
-    #[ORM\Column(nullable: false)]
-    private int $rgt;
+    #[ORM\Column(name: 'rgt', nullable: false)]
+    private int $right;
 
     #[Gedmo\TreeRoot]
-    #[ORM\ManyToOne(targetEntity: self::class)]
-    #[ORM\JoinColumn(referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
+    #[ORM\JoinColumn(referencedColumnName: 'id')]
     private ?SiteTree $root = null;
 
     #[ORM\Column(nullable: true)]
@@ -53,11 +56,20 @@ class SiteTree extends BaseEntity
     #[ORM\Column(nullable: true)]
     private ?bool $isVisible = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $isTranslatable = null;
-
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $title = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $slug = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $metaTitle = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $metaDescription = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isTranslatable = null;
 
     public function __construct()
     {
@@ -124,18 +136,6 @@ class SiteTree extends BaseEntity
         return $this;
     }
 
-    public function getIsTranslatable(): ?bool
-    {
-        return $this->isTranslatable;
-    }
-
-    public function setIsTranslatable(?bool $isTranslatable): self
-    {
-        $this->isTranslatable = $isTranslatable;
-
-        return $this;
-    }
-
     public function getTitle(): ?array
     {
         return $this->title;
@@ -148,38 +148,98 @@ class SiteTree extends BaseEntity
         return $this;
     }
 
-    public function getLvl(): int
+    public function getSlug(): ?array
     {
-        return $this->lvl;
+        return $this->slug;
     }
 
-    public function setLvl(int $lvl): self
+    public function setSlug(?array $slug): self
     {
-        $this->lvl = $lvl;
+        $this->slug = $slug;
 
         return $this;
     }
 
-    public function getLft(): int
+    public function getMetaTitle(): ?array
     {
-        return $this->lft;
+        return $this->metaTitle;
     }
 
-    public function setLft(int $lft): self
+    public function setMetaTitle(?array $metaTitle): self
     {
-        $this->lft = $lft;
+        $this->metaTitle = $metaTitle;
 
         return $this;
     }
 
-    public function getRgt(): int
+    public function getMetaDescription(): ?array
     {
-        return $this->rgt;
+        return $this->metaDescription;
     }
 
-    public function setRgt(int $rgt): self
+    public function setMetaDescription(?array $metaDescription): self
     {
-        $this->rgt = $rgt;
+        $this->metaDescription = $metaDescription;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
+
+    public function setLevel(int $level): self
+    {
+        $this->level = $level;
+
+        return $this;
+    }
+
+    public function getLeft(): int
+    {
+        return $this->left;
+    }
+
+    public function setLeft(int $left): self
+    {
+        $this->left = $left;
+
+        return $this;
+    }
+
+    public function getRight(): int
+    {
+        return $this->right;
+    }
+
+    public function setRight(int $right): self
+    {
+        $this->right = $right;
+
+        return $this;
+    }
+
+    public function getIsTranslatable(): ?bool
+    {
+        return $this->isTranslatable;
+    }
+
+    public function setIsTranslatable(?bool $isTranslatable): self
+    {
+        $this->isTranslatable = $isTranslatable;
 
         return $this;
     }

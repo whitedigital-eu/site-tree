@@ -43,7 +43,7 @@ final readonly class SiteTreeDataProvider extends AbstractDataProvider
     protected function getRootsCollection(?Operation $operation = null, array $context = []): array|object
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->select('e')->from($resourceClass = $this->getEntityClass($operation), 'e')->where('e.lvl = 0');
+        $queryBuilder->select('e')->from($resourceClass = $this->getEntityClass($operation), 'e')->where('e.level = 0');
 
         $this->authorizationService->limitGetCollection($resourceClass, $queryBuilder);
 
