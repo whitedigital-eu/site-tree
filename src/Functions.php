@@ -4,7 +4,7 @@ namespace WhiteDigital\SiteTree;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityRepository;
-use JetBrains\PhpStorm\Pure;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,7 +25,6 @@ final readonly class Functions
     ) {
     }
 
-    #[Pure]
     public function isAssociative(mixed $array): bool
     {
         if (!is_array(value: $array) || [] === $array) {
@@ -37,12 +36,13 @@ final readonly class Functions
 
     /**
      * @throws Exception
+     * @throws NonUniqueResultException
      */
     public function getSlug(string $lang, ?SiteTree $item = null, string $slug = ''): ?string
     {
         if ($item) {
             if (0 !== $item->getLevel()) {
-                return $this->getSlug($lang, $this->repository->getParentById($item->getId()), $item->getSlug()[$lang] ?? '') . ('' !== $slug ? '/' . $slug : '');
+                return $this->getSlug($lang, $this->repository->getParentById($item->getId(), true), $item->getSlug()[$lang] ?? '') . ('' !== $slug ? '/' . $slug : '');
             }
 
             return ($item->getSlug()[$lang] ?? '') . ('' !== $slug ? '/' . $slug : '');
@@ -51,6 +51,10 @@ final readonly class Functions
         return $slug;
     }
 
+    /**
+     * @throws Exception
+     * @throws NonUniqueResultException
+     */
     public function findContentType(string $path): SiteTree
     {
         $languages = $this->bag->get('whitedigital.site_tree.languages');
@@ -66,7 +70,7 @@ final readonly class Functions
         }
 
         $found = null;
-        foreach ($this->repository->findAllActiveByMaxLevel(substr_count($slug, '/')) as $item) {
+        foreach ($this->repository->findAllActiveByLevel(substr_count($slug, '/')) as $item) {
             if ($this->getSlug($lang, $item) === $slug) {
                 $found = $item;
             }

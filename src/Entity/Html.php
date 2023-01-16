@@ -2,7 +2,6 @@
 
 namespace WhiteDigital\SiteTree\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
@@ -17,7 +16,7 @@ class Html extends BaseEntity implements TreeEntity
     use Id;
     use Traits\SiteTreeNode;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $content = null;
 
     public function getContent(): ?array

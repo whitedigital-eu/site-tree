@@ -1,0 +1,51 @@
+{
+    "name": "whitedigital-eu/site-tree",
+    "description": "Site Tree",
+    "type": "symfony-bundle",
+    "keywords": [
+        "api-platform",
+        "php",
+        "site-tree",
+        "symfony",
+        "symfony-bundle"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1.0",
+        "api-platform/core": "^3",
+        "doctrine/collections": "*",
+        "doctrine/orm": "*",
+        "gedmo/doctrine-extensions": "^3",
+        "stof/doctrine-extensions-bundle": "*",
+        "symfony/config": ">=6.2",
+        "symfony/dependency-injection": ">=6.2",
+        "symfony/framework-bundle": ">=6.2",
+        "symfony/http-foundation": ">=6.2",
+        "symfony/http-kernel": ">=6.2",
+        "symfony/routing": ">=6.2",
+        "symfony/serializer": ">=6.2",
+        "symfony/validator": ">=6.2",
+        "whitedigital-eu/api-resource": ">=0.2",
+        "whitedigital-eu/entity-resource-mapper-bundle": ">=0.21"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "*",
+        "roave/security-advisories": "dev-latest",
+        "whitedigital-eu/config-pack": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "WhiteDigital\\SiteTree\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.x-dev"
+        }
+    }
+}

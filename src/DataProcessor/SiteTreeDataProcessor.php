@@ -4,6 +4,7 @@ namespace WhiteDigital\SiteTree\DataProcessor;
 
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\NonUniqueResultException;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -25,6 +26,7 @@ final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
 
     /**
      * @throws Exception
+     * @throws NonUniqueResultException
      */
     protected function createEntity(BaseResource $resource, array $context, ?BaseEntity $existingEntity = null): SiteTree
     {
@@ -62,7 +64,7 @@ final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
 
         $entity = SiteTree::create($resource, $context, $existingEntity);
 
-        $root = $entity?->getRoot() ?? $entity?->getParent()?->getRoot() ?? null;
+        $root = $entity->getRoot() ?? $entity->getParent()?->getRoot() ?? null;
 
         if (false !== $root?->getIsTranslatable() && null !== $exception) {
             throw $exception;

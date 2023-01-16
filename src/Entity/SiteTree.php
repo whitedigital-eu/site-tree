@@ -5,7 +5,6 @@ namespace WhiteDigital\SiteTree\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
@@ -56,16 +55,16 @@ class SiteTree extends BaseEntity
     #[ORM\Column(nullable: true)]
     private ?bool $isVisible = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $title = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $slug = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $metaTitle = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $metaDescription = null;
 
     #[ORM\Column(nullable: true)]
