@@ -19,6 +19,7 @@ use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 class SiteTree extends BaseEntity
 {
     use Id;
+    use Traits\Active;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, fetch: 'EAGER')]
     #[ORM\OrderBy(['left' => Criteria::ASC])]
@@ -48,9 +49,6 @@ class SiteTree extends BaseEntity
     #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(referencedColumnName: 'id')]
     private ?SiteTree $root = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?bool $isActive = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $isVisible = null;
@@ -107,18 +105,6 @@ class SiteTree extends BaseEntity
     public function setRoot(?self $root): self
     {
         $this->root = $root;
-
-        return $this;
-    }
-
-    public function getIsActive(): ?bool
-    {
-        return $this->isActive;
-    }
-
-    public function setIsActive(?bool $isActive): self
-    {
-        $this->isActive = $isActive;
 
         return $this;
     }

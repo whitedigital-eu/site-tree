@@ -14,6 +14,7 @@ use WhiteDigital\SiteTree\Contracts\TreeEntity;
 class Html extends BaseEntity implements TreeEntity
 {
     use Id;
+    use Traits\Active;
     use Traits\SiteTreeNode;
 
     #[ORM\Column(type: 'json', nullable: true)]
