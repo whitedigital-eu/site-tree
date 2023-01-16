@@ -10,12 +10,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeApiResource;
+use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
 #[ORM\Entity(repositoryClass: SiteTreeRepository::class)]
 #[Gedmo\Tree(type: 'nested')]
-#[Mapping(SiteTreeApiResource::class)]
+#[Mapping(SiteTreeResource::class)]
 class SiteTree extends BaseEntity
 {
     use Id;

@@ -10,7 +10,7 @@ use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\ApiResource\Php82\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeApiResource;
+use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 
 final readonly class SiteTreeDataProvider extends AbstractDataProvider
 {
@@ -35,9 +35,9 @@ final readonly class SiteTreeDataProvider extends AbstractDataProvider
      * @throws ResourceClassNotFoundException
      * @throws ReflectionException
      */
-    protected function createResource(BaseEntity $entity, array $context): SiteTreeApiResource
+    protected function createResource(BaseEntity $entity, array $context): SiteTreeResource
     {
-        return SiteTreeApiResource::create($entity, $context);
+        return SiteTreeResource::create($entity, $context);
     }
 
     protected function getRootsCollection(?Operation $operation = null, array $context = []): array|object

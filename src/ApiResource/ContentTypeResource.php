@@ -19,11 +19,11 @@ use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
         provider: ContentTypeDataProvider::class,
     )
 ]
-class ContentTypeApiResource
+class ContentTypeResource
 {
     public ?int $nodeId = null;
 
-    public ?SiteTreeApiResource $node = null;
+    public ?SiteTreeResource $node = null;
 
     public ?string $type = null;
 }

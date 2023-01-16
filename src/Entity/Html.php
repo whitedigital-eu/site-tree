@@ -6,11 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
-use WhiteDigital\SiteTree\ApiResource\HtmlApiResource;
+use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 use WhiteDigital\SiteTree\Contracts\TreeEntity;
 
 #[ORM\Entity]
-#[Mapping(HtmlApiResource::class)]
+#[Mapping(HtmlResource::class)]
 class Html extends BaseEntity implements TreeEntity
 {
     use Id;

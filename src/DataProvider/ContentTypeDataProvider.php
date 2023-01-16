@@ -10,8 +10,8 @@ use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\SiteTree\ApiResource\ContentTypeApiResource;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeApiResource;
+use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
+use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Functions;
 
@@ -40,9 +40,9 @@ class ContentTypeDataProvider implements ProviderInterface
             throw new $exception();
         }
 
-        $resource = new ContentTypeApiResource();
+        $resource = new ContentTypeResource();
         $resource->nodeId = $found->getId();
-        $resource->node = SiteTreeApiResource::create($found, $context);
+        $resource->node = SiteTreeResource::create($found, $context);
         $resource->type = $found->getType();
 
         return $resource;

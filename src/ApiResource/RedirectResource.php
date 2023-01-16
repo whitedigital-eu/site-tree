@@ -46,7 +46,7 @@ use WhiteDigital\SiteTree\Entity\Redirect;
     )
 ]
 #[Mapping(Redirect::class)]
-class RedirectApiResource extends BaseResource
+class RedirectResource extends BaseResource
 {
     #[ApiProperty(identifier: true)]
     #[Groups(['redirect:item', 'redirect:read', ])]
@@ -62,7 +62,7 @@ class RedirectApiResource extends BaseResource
 
     #[Groups(['redirect:read', 'redirect:item', 'redirect:patch', 'redirect:post', ])]
     #[Assert\NotBlank]
-    public ?SiteTreeApiResource $node = null;
+    public ?SiteTreeResource $node = null;
 
     #[Groups(['redirect:item', 'redirect:read', ])]
     public ?DateTimeImmutable $createdAt = null;

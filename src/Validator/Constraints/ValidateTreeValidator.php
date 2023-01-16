@@ -4,13 +4,13 @@ namespace WhiteDigital\SiteTree\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeApiResource;
+use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 
 class ValidateTreeValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {
-        /** @var SiteTreeApiResource $value */
+        /** @var SiteTreeResource $value */
         if (null === $value->parent && null === $value->isTranslatable) {
             $this->context->buildViolation('You must set "isTranslatable" key on root node')->addViolation();
         }

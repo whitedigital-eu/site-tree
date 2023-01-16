@@ -7,7 +7,7 @@ use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\ApiResource\Php82\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
-use WhiteDigital\SiteTree\ApiResource\HtmlApiResource;
+use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 
 final readonly class HtmlDataProvider extends AbstractDataProvider
 {
@@ -16,8 +16,8 @@ final readonly class HtmlDataProvider extends AbstractDataProvider
      * @throws ResourceClassNotFoundException
      * @throws ReflectionException
      */
-    protected function createResource(BaseEntity $entity, array $context): HtmlApiResource
+    protected function createResource(BaseEntity $entity, array $context): HtmlResource
     {
-        return HtmlApiResource::create($entity, $context);
+        return HtmlResource::create($entity, $context);
     }
 }

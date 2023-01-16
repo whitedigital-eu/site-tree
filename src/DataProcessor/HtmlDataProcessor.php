@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\ApiResource\Php82\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\ApiResource\HtmlApiResource;
+use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 use WhiteDigital\SiteTree\Contracts\TreeEntity;
 use WhiteDigital\SiteTree\Entity\Html;
 
@@ -33,8 +33,8 @@ final readonly class HtmlDataProcessor extends AbstractDataProcessor
      * @throws ReflectionException
      * @throws ResourceClassNotFoundException
      */
-    protected function createResource(BaseEntity $entity, array $context): HtmlApiResource
+    protected function createResource(BaseEntity $entity, array $context): HtmlResource
     {
-        return HtmlApiResource::create($entity, $context);
+        return HtmlResource::create($entity, $context);
     }
 }

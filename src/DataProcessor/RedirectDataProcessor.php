@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\ApiResource\Php82\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\ApiResource\RedirectApiResource;
+use WhiteDigital\SiteTree\ApiResource\RedirectResource;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
 final readonly class RedirectDataProcessor extends AbstractDataProcessor
@@ -28,8 +28,8 @@ final readonly class RedirectDataProcessor extends AbstractDataProcessor
      * @throws ReflectionException
      * @throws ResourceClassNotFoundException
      */
-    protected function createResource(BaseEntity $entity, array $context): RedirectApiResource
+    protected function createResource(BaseEntity $entity, array $context): RedirectResource
     {
-        return RedirectApiResource::create($entity, $context);
+        return RedirectResource::create($entity, $context);
     }
 }

@@ -60,14 +60,14 @@ use WhiteDigital\SiteTree\Validator\Constraints\ValidateTree;
 ]
 #[Mapping(SiteTree::class)]
 #[ValidateTree]
-class SiteTreeApiResource extends BaseResource
+class SiteTreeResource extends BaseResource
 {
     #[ApiProperty(identifier: true)]
     #[Groups(['site_tree:item', 'site_tree:read', ])]
     public mixed $id = null;
 
     #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
-    public ?SiteTreeApiResource $root = null;
+    public ?SiteTreeResource $root = null;
 
     #[Groups(['site_tree:item', 'site_tree:read', ])]
     public ?int $level = null;
@@ -90,7 +90,7 @@ class SiteTreeApiResource extends BaseResource
     public ?DateTimeImmutable $updatedAt = null;
 
     #[Groups(['site_tree:patch', 'site_tree:post', ])]
-    public ?SiteTreeApiResource $parent = null;
+    public ?SiteTreeResource $parent = null;
 
     #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
     #[ApiProperty(openapiContext: ['example' => ['en' => 'example', 'lv' => 'piemers', ]])]
@@ -125,7 +125,7 @@ class SiteTreeApiResource extends BaseResource
     #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
     public ?bool $isTranslatable = null;
 
-    /** @var SiteTreeApiResource[]|null */
+    /** @var SiteTreeResource[]|null */
     #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
     #[SkipCircularReferenceCheck]
     public ?array $children = null;

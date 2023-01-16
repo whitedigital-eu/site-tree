@@ -6,11 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
-use WhiteDigital\SiteTree\ApiResource\RedirectApiResource;
+use WhiteDigital\SiteTree\ApiResource\RedirectResource;
 use WhiteDigital\SiteTree\Contracts\TreeEntity;
 
 #[ORM\Entity]
-#[Mapping(RedirectApiResource::class)]
+#[Mapping(RedirectResource::class)]
 class Redirect extends BaseEntity implements TreeEntity
 {
     use Id;

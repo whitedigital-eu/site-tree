@@ -52,7 +52,7 @@ use WhiteDigital\SiteTree\Entity\Html;
     ApiFilter(ResourceSearchFilter::class, properties: ['node.id', ]),
 ]
 #[Mapping(Html::class)]
-class HtmlApiResource extends BaseResource
+class HtmlResource extends BaseResource
 {
     #[ApiProperty(identifier: true)]
     #[Groups(['html:item', 'html:read', ])]
@@ -65,7 +65,7 @@ class HtmlApiResource extends BaseResource
 
     #[Groups(['html:read', 'html:item', 'html:patch', 'html:post', ])]
     #[Assert\NotBlank]
-    public ?SiteTreeApiResource $node = null;
+    public ?SiteTreeResource $node = null;
 
     #[Groups(['html:item', 'html:read', ])]
     public ?DateTimeImmutable $createdAt = null;
