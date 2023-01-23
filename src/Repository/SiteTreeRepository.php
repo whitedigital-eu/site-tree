@@ -20,7 +20,6 @@ class SiteTreeRepository extends NestedTreeRepository
 {
     /**
      * @throws Exception
-     * @throws NonUniqueResultException
      */
     public function getRootById(int $id): ?SiteTree
     {
@@ -35,7 +34,6 @@ class SiteTreeRepository extends NestedTreeRepository
 
     /**
      * @throws Exception
-     * @throws NonUniqueResultException
      */
     public function getParentById(int $id, ?bool $status = null): ?SiteTree
     {
@@ -48,9 +46,6 @@ class SiteTreeRepository extends NestedTreeRepository
         return null;
     }
 
-    /**
-     * @throws NonUniqueResultException
-     */
     public function findSiteTreeById(int $id, ?bool $status = true): ?SiteTree
     {
         $qb = $this->createQueryBuilder('st');
@@ -61,13 +56,18 @@ class SiteTreeRepository extends NestedTreeRepository
                 ->setParameter('status', $status);
         }
 
-        return $qb
-            ->select('st')
-            ->andWhere('st.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true)
-            ->getOneOrNullResult();
+        try {
+            return $qb
+                ->select('st')
+                ->andWhere('st.id = :id')
+                ->setParameter('id', $id)
+                ->getQuery()
+                ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true)
+                ->getOneOrNullResult();
+        } catch (NonUniqueResultException) {
+        }
+
+        return null;
     }
 
     public function findAllActiveByLevel(int $level): array

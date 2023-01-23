@@ -34,10 +34,6 @@ final readonly class Functions
         return !array_is_list(array: $array);
     }
 
-    /**
-     * @throws Exception
-     * @throws NonUniqueResultException
-     */
     public function getSlug(string $lang, ?SiteTree $item = null, string $slug = ''): ?string
     {
         if ($item) {
@@ -51,10 +47,6 @@ final readonly class Functions
         return $slug;
     }
 
-    /**
-     * @throws Exception
-     * @throws NonUniqueResultException
-     */
     public function findContentType(string $path): SiteTree
     {
         $languages = $this->bag->get('whitedigital.site_tree.languages');

@@ -5,7 +5,9 @@ namespace WhiteDigital\SiteTree\DataProvider;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -28,9 +30,11 @@ class ContentTypeDataProvider implements ProviderInterface
     }
 
     /**
-     * @throws ResourceClassNotFoundException
-     * @throws ReflectionException
      * @throws ExceptionInterface
+     * @throws ReflectionException
+     * @throws ResourceClassNotFoundException
+     * @throws Exception
+     * @throws NonUniqueResultException
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {

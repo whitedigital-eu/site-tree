@@ -41,8 +41,9 @@ class SiteTreeController extends AbstractController
             $redirect = $em->getRepository(Redirect::class)->findOneBy(['node' => $found, 'isActive' => true]);
             if (null !== $redirect) {
                 $url = $redirect->getContent();
+
                 if (false === filter_var(value: filter_var(value: $url, filter: FILTER_SANITIZE_URL), filter: FILTER_VALIDATE_URL)) {
-                    $url = $router->generate('wd_site_index', ['path' => $redirect->getContent()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url = $router->generate('wd_site_index', ['path' => $url], UrlGeneratorInterface::ABSOLUTE_URL);
                 }
 
                 return $this->redirect($url, $redirect->getCode());
