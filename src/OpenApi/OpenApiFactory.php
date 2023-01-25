@@ -23,17 +23,20 @@ final readonly class OpenApiFactory implements OpenApiFactoryInterface
     {
         $valid = $this->bag->has($key = 'whitedigital.site_tree.enabled') && true === $this->bag->get($key);
         $openApi = $this->decorated->__invoke($context);
-        $paths = $openApi->getPaths()->getPaths();
 
-        $filteredPaths = new Model\Paths();
-        foreach ($paths as $path => $pathItem) {
-            if (str_starts_with($path, '/api/wd/') && !$valid) {
-                continue;
+        if (!$valid) {
+            $filteredPaths = new Model\Paths();
+            foreach ($openApi->getPaths()->getPaths() as $path => $pathItem) {
+                if (str_starts_with($path, '/api/wd/st/')) {
+                    continue;
+                }
+
+                $filteredPaths->addPath($path, $pathItem);
             }
 
-            $filteredPaths->addPath($path, $pathItem);
+            return $openApi->withPaths($filteredPaths);
         }
 
-        return $openApi->withPaths($filteredPaths);
+        return $openApi;
     }
 }

@@ -10,14 +10,14 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Serializer\Filter\GroupFilter;
-use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\Attribute\Translatable;
 use WhiteDigital\SiteTree\DataProcessor\HtmlDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\HtmlDataProvider;
 use WhiteDigital\SiteTree\Entity\Html;
@@ -28,22 +28,22 @@ use WhiteDigital\SiteTree\Entity\Html;
         operations: [
             new Get(
                 requirements: ['id' => '\d+', ],
-                normalizationContext: ['groups' => ['html:item', ], ],
+                normalizationContext: ['groups' => [self::ITEM, ], ],
             ),
             new GetCollection(
-                normalizationContext: ['groups' => ['html:read', ], ],
+                normalizationContext: ['groups' => [self::READ, ], ],
             ),
             new Patch(
                 requirements: ['id' => '\d+', ],
-                denormalizationContext: ['groups' => ['html:patch', ], ],
+                denormalizationContext: ['groups' => [self::PATCH, ], ],
             ),
             new Post(
-                denormalizationContext: ['groups' => ['html:post', ], ],
+                denormalizationContext: ['groups' => [self::READ, ], ],
             ),
         ],
-        routePrefix: '/wd',
-        normalizationContext: ['groups' => ['html:read', 'html:item', ], ],
-        denormalizationContext: ['groups' => ['html:post', ], ],
+        routePrefix: '/wd/st',
+        normalizationContext: ['groups' => [self::READ, self::ITEM, ], ],
+        denormalizationContext: ['groups' => [self::WRITE, ], ],
         order: ['id' => Criteria::ASC, ],
         provider: HtmlDataProvider::class,
         processor: HtmlDataProcessor::class,
@@ -54,22 +54,21 @@ use WhiteDigital\SiteTree\Entity\Html;
 #[Mapping(Html::class)]
 class HtmlResource extends BaseResource
 {
+    use ARTraits\CreatedUpdated;
+    use ARTraits\Groups;
+    use Traits\SiteTreeNode;
+
+    public const PREFIX = 'html:';
+
     #[ApiProperty(identifier: true)]
-    #[Groups(['html:item', 'html:read', ])]
+    #[Groups([self::ITEM, self::READ, ])]
     public mixed $id = null;
 
-    #[Groups(['html:read', 'html:item', 'html:patch', 'html:post', ])]
-    #[Translatable]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Assert\Type(type: Type::BUILTIN_TYPE_BOOL)]
+    public ?bool $isActive = null;
+
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
-    public ?array $content = null;
-
-    #[Groups(['html:read', 'html:item', 'html:patch', 'html:post', ])]
-    #[Assert\NotBlank]
-    public ?SiteTreeResource $node = null;
-
-    #[Groups(['html:item', 'html:read', ])]
-    public ?DateTimeImmutable $createdAt = null;
-
-    #[Groups(['html:item', 'html:read', ])]
-    public ?DateTimeImmutable $updatedAt = null;
+    public ?string $content = null;
 }

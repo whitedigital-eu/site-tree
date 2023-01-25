@@ -1,15 +1,21 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree\Entity\Traits;
+namespace WhiteDigital\SiteTree\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use WhiteDigital\SiteTree\Entity\SiteTree;
+use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
+use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
+use WhiteDigital\SiteTree\Entity\Traits\Active;
 
-trait SiteTreeNode
+#[ORM\MappedSuperclass]
+abstract class AbstractNodeEntity extends BaseEntity
 {
+    use Active;
+    use Id;
+
     #[ORM\ManyToOne(targetEntity: SiteTree::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?SiteTree $node = null;
+    protected ?SiteTree $node = null;
 
     public function getNode(): ?SiteTree
     {

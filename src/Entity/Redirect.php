@@ -4,19 +4,12 @@ namespace WhiteDigital\SiteTree\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
-use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
-use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
 use WhiteDigital\SiteTree\ApiResource\RedirectResource;
-use WhiteDigital\SiteTree\Contracts\TreeEntity;
 
 #[ORM\Entity]
 #[Mapping(RedirectResource::class)]
-class Redirect extends BaseEntity implements TreeEntity
+class Redirect extends AbstractNodeEntity
 {
-    use Id;
-    use Traits\Active;
-    use Traits\SiteTreeNode;
-
     #[ORM\Column(nullable: false)]
     private ?int $code = null;
 

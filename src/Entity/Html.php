@@ -4,28 +4,21 @@ namespace WhiteDigital\SiteTree\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
-use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
-use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
 use WhiteDigital\SiteTree\ApiResource\HtmlResource;
-use WhiteDigital\SiteTree\Contracts\TreeEntity;
 
 #[ORM\Entity]
 #[Mapping(HtmlResource::class)]
-class Html extends BaseEntity implements TreeEntity
+class Html extends AbstractNodeEntity
 {
-    use Id;
-    use Traits\Active;
-    use Traits\SiteTreeNode;
+    #[ORM\Column(nullable: true)]
+    private ?string $content = null;
 
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $content = null;
-
-    public function getContent(): ?array
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function setContent(?array $content): self
+    public function setContent(?string $content): self
     {
         $this->content = $content;
 

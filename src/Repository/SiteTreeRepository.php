@@ -83,4 +83,20 @@ class SiteTreeRepository extends NestedTreeRepository
             ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true)
             ->getResult();
     }
+
+    /**
+     * @throws Exception
+     */
+    public function getSlug(?SiteTree $item = null, string $slug = ''): ?string
+    {
+        if (null !== $item) {
+            if (0 !== $item->getLevel()) {
+                return $this->getSlug($this->getParentById($item->getId(), true), $item->getSlug() ?? '') . ('' !== $slug ? '/' . $slug : '');
+            }
+
+            return ($item->getSlug() ?? '') . ('' !== $slug ? '/' . $slug : '');
+        }
+
+        return $slug;
+    }
 }

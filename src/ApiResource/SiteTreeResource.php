@@ -9,19 +9,17 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\Attribute\Translatable;
 use WhiteDigital\SiteTree\DataProcessor\SiteTreeDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\SiteTreeDataProvider;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
-use WhiteDigital\SiteTree\Validator\Constraints\ValidateTree;
 
 #[
     ApiResource(
@@ -32,101 +30,86 @@ use WhiteDigital\SiteTree\Validator\Constraints\ValidateTree;
             ),
             new Get(
                 requirements: ['id' => '\d+', ],
-                normalizationContext: ['groups' => ['site_tree:item', ], ],
+                normalizationContext: ['groups' => [self::ITEM, ], ],
             ),
             new GetCollection(
-                normalizationContext: ['groups' => ['site_tree:read', ], ],
+                normalizationContext: ['groups' => [self::READ, ], ],
             ),
             new GetCollection(
                 uriTemplate: '/site_trees/roots',
-                normalizationContext: ['groups' => ['site_tree:read', ], ],
+                normalizationContext: ['groups' => [self::READ, ], ],
                 name: 'roots',
             ),
             new Patch(
                 requirements: ['id' => '\d+', ],
-                denormalizationContext: ['groups' => ['site_tree:patch', ], ],
+                denormalizationContext: ['groups' => [self::PATCH, ], ],
             ),
             new Post(
-                denormalizationContext: ['groups' => ['site_tree:post', ], ],
+                denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
         ],
-        routePrefix: '/wd',
-        normalizationContext: ['groups' => ['site_tree:read', 'site_tree:item', ], ],
-        denormalizationContext: ['groups' => ['site_tree:post', ], ],
+        routePrefix: '/wd/st',
+        normalizationContext: ['groups' => [self::ITEM, self::READ, ], ],
+        denormalizationContext: ['groups' => [self::WRITE, ], ],
         order: ['root' => Criteria::ASC, 'left' => Criteria::ASC, ],
         provider: SiteTreeDataProvider::class,
         processor: SiteTreeDataProcessor::class,
     )
 ]
 #[Mapping(SiteTree::class)]
-#[ValidateTree]
 class SiteTreeResource extends BaseResource
 {
+    use ARTraits\CreatedUpdated;
+    use ARTraits\Groups;
+
+    public const PREFIX = 'site_tree:';
+
     #[ApiProperty(identifier: true)]
-    #[Groups(['site_tree:item', 'site_tree:read', ])]
+    #[Groups([self::ITEM, self::READ, ])]
     public mixed $id = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public ?SiteTreeResource $root = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', ])]
+    #[Groups([self::ITEM, self::READ, ])]
     public ?int $level = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', ])]
+    #[Groups([self::ITEM, self::READ, ])]
     public ?int $left = null;
 
     public ?int $right = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public bool $isActive = false;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public bool $isVisible = true;
 
-    #[Groups(['site_tree:item', 'site_tree:read', ])]
-    public ?DateTimeImmutable $createdAt = null;
-
-    #[Groups(['site_tree:item', 'site_tree:read', ])]
-    public ?DateTimeImmutable $updatedAt = null;
-
-    #[Groups(['site_tree:patch', 'site_tree:post', ])]
+    #[Groups([self::PATCH, self::WRITE, ])]
     public ?SiteTreeResource $parent = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
-    #[ApiProperty(openapiContext: ['example' => ['en' => 'example', 'lv' => 'piemers', ]])]
-    #[Translatable]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
-    public ?array $title = null;
+    public ?string $title = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
-    #[ApiProperty(openapiContext: ['example' => ['en' => 'example', 'lv' => 'piemers', ]])]
-    #[Translatable]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
-    #[Assert\All(
-        new Assert\Length(min: 3),
-    )]
-    public ?array $slug = null;
+    #[Assert\Length(min: 3)]
+    public ?string $slug = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
-    #[ApiProperty(openapiContext: ['example' => ['en' => 'example', 'lv' => 'piemers', ]])]
-    #[Translatable]
-    public ?array $metaTitle = null;
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    public ?string $metaTitle = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
-    #[ApiProperty(openapiContext: ['example' => ['en' => 'example', 'lv' => 'piemers', ]])]
-    #[Translatable]
-    public ?array $metaDescription = null;
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    public ?string $metaDescription = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[AllowedType]
     #[Assert\NotBlank]
     public ?string $type = null;
 
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
-    public ?bool $isTranslatable = null;
-
     /** @var SiteTreeResource[]|null */
-    #[Groups(['site_tree:item', 'site_tree:read', 'site_tree:patch', 'site_tree:post', ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[SkipCircularReferenceCheck]
     public ?array $children = null;
 }

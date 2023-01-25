@@ -53,20 +53,17 @@ class SiteTree extends BaseEntity
     #[ORM\Column(nullable: true)]
     private ?bool $isVisible = null;
 
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $title = null;
-
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $slug = null;
-
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $metaTitle = null;
-
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $metaDescription = null;
+    #[ORM\Column(nullable: true)]
+    private ?string $title = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $isTranslatable = null;
+    private ?string $slug = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $metaTitle = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $metaDescription = null;
 
     public function __construct()
     {
@@ -121,48 +118,48 @@ class SiteTree extends BaseEntity
         return $this;
     }
 
-    public function getTitle(): ?array
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(?array $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getSlug(): ?array
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    public function setSlug(?array $slug): self
+    public function setSlug(?string $slug): self
     {
         $this->slug = $slug;
 
         return $this;
     }
 
-    public function getMetaTitle(): ?array
+    public function getMetaTitle(): ?string
     {
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(?array $metaTitle): self
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
 
         return $this;
     }
 
-    public function getMetaDescription(): ?array
+    public function getMetaDescription(): ?string
     {
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(?array $metaDescription): self
+    public function setMetaDescription(?string $metaDescription): self
     {
         $this->metaDescription = $metaDescription;
 
@@ -213,18 +210,6 @@ class SiteTree extends BaseEntity
     public function setRight(int $right): self
     {
         $this->right = $right;
-
-        return $this;
-    }
-
-    public function getIsTranslatable(): ?bool
-    {
-        return $this->isTranslatable;
-    }
-
-    public function setIsTranslatable(?bool $isTranslatable): self
-    {
-        $this->isTranslatable = $isTranslatable;
 
         return $this;
     }

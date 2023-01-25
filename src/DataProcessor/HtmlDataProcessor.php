@@ -9,23 +9,18 @@ use WhiteDigital\ApiResource\Php82\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\ApiResource\HtmlResource;
-use WhiteDigital\SiteTree\Contracts\TreeEntity;
 use WhiteDigital\SiteTree\Entity\Html;
 
 final readonly class HtmlDataProcessor extends AbstractDataProcessor
 {
-    use Traits\ValidateResource;
-
     public function getEntityClass(): string
     {
         return Html::class;
     }
 
-    protected function createEntity(BaseResource $resource, array $context, ?BaseEntity $existingEntity = null): Html|TreeEntity
+    protected function createEntity(BaseResource $resource, array $context, ?BaseEntity $existingEntity = null): Html
     {
-        $entity = Html::create($resource, $context, $existingEntity);
-
-        return $this->validateEntity($entity, $resource, $context, $existingEntity);
+        return Html::create($resource, $context, $existingEntity);
     }
 
     /**

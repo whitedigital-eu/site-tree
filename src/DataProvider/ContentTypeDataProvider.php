@@ -7,7 +7,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NonUniqueResultException;
 use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -26,7 +25,7 @@ class ContentTypeDataProvider implements ProviderInterface
         protected iterable $collectionExtensions = [],
         protected ?EntityManagerInterface $em = null,
     ) {
-        $this->functions = new Functions($bag, $this->em->getRepository(SiteTree::class));
+        $this->functions = new Functions($this->em, $bag, $this->em->getRepository(SiteTree::class));
     }
 
     /**
@@ -34,7 +33,6 @@ class ContentTypeDataProvider implements ProviderInterface
      * @throws ReflectionException
      * @throws ResourceClassNotFoundException
      * @throws Exception
-     * @throws NonUniqueResultException
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
