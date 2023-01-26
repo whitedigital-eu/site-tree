@@ -86,14 +86,23 @@ class SiteTreeBundle extends AbstractBundle
         $audit = array_merge_recursive(...$builder->getExtensionConfig('whitedigital') ?? [])['audit'] ?? [];
 
         if (true === ($siteTree['enabled'] ?? true)) {
-            $mappings = $this->getOrmMappings($builder, $siteTree['entity_manager'] ?? 'default');
+            $manager = $siteTree['entity_manager'] ?? 'default';
+            $mappings = $this->getOrmMappings($builder, $manager);
 
-            $this->addDoctrineConfig($container, $siteTree['entity_manager'] ?? 'default', $mappings, 'SiteTree', self::MAPPINGS);
+            $this->addDoctrineConfig($container, $manager, $mappings, 'SiteTree', self::MAPPINGS);
             $this->addApiPlatformPaths($container, self::PATHS);
 
             if (true === ($audit['enabled'] ?? false)) {
                 $this->addDoctrineConfig($container, $audit['audit_entity_manager'], $mappings, 'SiteTree', self::MAPPINGS);
             }
+
+            $container->extension('stof_doctrine_extensions', [
+                'orm' => [
+                    $manager => [
+                        'tree' => true,
+                    ],
+                ],
+            ]);
         }
     }
 }
