@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -77,7 +78,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             }
         }
 
-        $functions = new Functions($this->em, $this->bag, $this->em->getRepository(SiteTree::class));
+        $functions = new Functions($this->em, $this->bag, $this->translator, $this->em->getRepository(SiteTree::class));
         $response = new Response();
 
         $found = null;
@@ -118,7 +119,11 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $parameters = $this->matcher->match($request->getPathInfo());
+            if ($this->matcher instanceof RequestMatcherInterface) {
+                $parameters = $this->matcher->matchRequest($request);
+            } else {
+                $parameters = $this->matcher->match($request->getPathInfo());
+            }
 
             $request->attributes->add($parameters);
             unset($parameters['_route'], $parameters['_controller']);

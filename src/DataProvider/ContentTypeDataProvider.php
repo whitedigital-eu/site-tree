@@ -11,21 +11,22 @@ use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Functions;
 
-class ContentTypeDataProvider implements ProviderInterface
+final readonly class ContentTypeDataProvider implements ProviderInterface
 {
-    private readonly Functions $functions;
+    private Functions $functions;
 
     public function __construct(
         ParameterBagInterface $bag,
-        protected iterable $collectionExtensions = [],
-        protected ?EntityManagerInterface $em = null,
+        TranslatorInterface $translator,
+        protected EntityManagerInterface $em,
     ) {
-        $this->functions = new Functions($this->em, $bag, $this->em->getRepository(SiteTree::class));
+        $this->functions = new Functions($this->em, $bag, $translator, $this->em->getRepository(SiteTree::class));
     }
 
     /**

@@ -2,12 +2,14 @@
 
 namespace WhiteDigital\SiteTree\ApiResource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Serializer\Filter\GroupFilter;
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyInfo\Type;
@@ -15,6 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\RedirectDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\RedirectDataProvider;
@@ -45,7 +48,9 @@ use WhiteDigital\SiteTree\Entity\Redirect;
         order: ['id' => Criteria::ASC, ],
         provider: RedirectDataProvider::class,
         processor: RedirectDataProcessor::class,
-    )
+    ),
+    ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
+    ApiFilter(ResourceSearchFilter::class, properties: ['node.id', ]),
 ]
 #[Mapping(Redirect::class)]
 class RedirectResource extends BaseResource

@@ -28,9 +28,9 @@ final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
         $entity = SiteTree::create($resource, $context, $existingEntity);
 
         if (null !== $existingEntity) {
-            $repo = $this->entityManager->getRepository($existingEntity::class);
+            $repo = $this->entityManager->getRepository(SiteTree::class);
             /* @var SiteTreeRepository $repo */
-            $entity->setRoot($root = $repo->getRootById($existingEntity->getId()));
+            $entity->setRoot($repo->getRootById($existingEntity->getId()));
             $entity->setParent($repo->getParentById($existingEntity->getId()));
         }
 

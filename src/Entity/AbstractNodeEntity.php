@@ -8,6 +8,7 @@ use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
 use WhiteDigital\SiteTree\Entity\Traits\Active;
 
 #[ORM\MappedSuperclass]
+#[ORM\Index(fields: ['node', 'isActive'])]
 abstract class AbstractNodeEntity extends BaseEntity
 {
     use Active;

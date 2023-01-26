@@ -2,6 +2,7 @@
 
 namespace WhiteDigital\SiteTree\ApiResource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -9,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Serializer\Filter\GroupFilter;
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -54,7 +56,8 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
         order: ['root' => Criteria::ASC, 'left' => Criteria::ASC, ],
         provider: SiteTreeDataProvider::class,
         processor: SiteTreeDataProcessor::class,
-    )
+    ),
+    ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
 ]
 #[Mapping(SiteTree::class)]
 class SiteTreeResource extends BaseResource
