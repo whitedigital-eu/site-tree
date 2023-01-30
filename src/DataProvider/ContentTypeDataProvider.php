@@ -24,9 +24,9 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
     public function __construct(
         ParameterBagInterface $bag,
         TranslatorInterface $translator,
-        protected EntityManagerInterface $em,
+        EntityManagerInterface $em,
     ) {
-        $this->functions = new Functions($this->em, $bag, $translator, $this->em->getRepository(SiteTree::class));
+        $this->functions = new Functions($em, $bag, $translator, $em->getRepository(SiteTree::class));
     }
 
     /**

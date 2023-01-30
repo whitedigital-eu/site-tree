@@ -4,19 +4,19 @@
         <body>
             <trans-unit id="1">
                 <source>method_not_allowed</source>
-                <target>Nav atrasts ceļš "{method} {uri}": Metode nav atļauta (Autļautās metodes: {allowed])</target>
+                <target>No route found for "{method} {uri}": Method Not Allowed (Allow: {allowed})</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Not Found</source>
-                <target>Nav Atrasts</target>
+                <target>Not Found</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>one_active_node_allowed</source>
-                <target>Viens SiteTree ieraksts drīkst norādīt tikai uz vienu aktīvu ierakstu. Aktīvs ieraksts atrasts "{entity}"</target>
+                <target>One SiteTree node can only point to one active entity. Active item found in "{entity}"</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>invalid_parameter_list_allowed</source>
-                <target>Nekorekts tips: {parameter}. Atļautie tipi: {allowed}</target>
+                <target>Invalid type: {parameter}. Allowed types: {allowed}</target>
             </trans-unit>
         </body>
     </file>

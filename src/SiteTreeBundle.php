@@ -2,17 +2,26 @@
 
 namespace WhiteDigital\SiteTree;
 
+use ReflectionClass;
+use ReflectionClassConstant;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use WhiteDigital\ApiResource\DependencyInjections\Traits\DefineApiPlatformMappings;
 use WhiteDigital\ApiResource\DependencyInjections\Traits\DefineOrmMappings;
+use WhiteDigital\ApiResource\Functions;
 use WhiteDigital\SiteTree\Entity\Html;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
+use function array_filter;
 use function array_merge_recursive;
+use function str_starts_with;
 use function ucfirst;
+
+use const ARRAY_FILTER_USE_KEY;
 
 class SiteTreeBundle extends AbstractBundle
 {
@@ -34,28 +43,36 @@ class SiteTreeBundle extends AbstractBundle
 
     public function configure(DefinitionConfigurator $definition): void
     {
-        $definition
-            ->rootNode()
+        $root = $definition
+            ->rootNode();
+
+        $root
             ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->arrayNode('types')
-                    ->useAttributeAsKey('type')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('entity')->defaultValue(null)->end()
-                        ->end()
+            ->arrayNode('types')
+                ->useAttributeAsKey('type')
+                ->arrayPrototype()
+                    ->children()
+                        ->scalarNode('entity')->defaultValue(null)->end()
                     ->end()
                 ->end()
-                ->scalarNode('entity_prefix')->defaultValue('App\\Entity')->end()
-                ->scalarNode('entity_manager')->defaultValue('default')->end()
+            ->end()
+            ->scalarNode('entity_prefix')->defaultValue('App\\Entity')->end()
+            ->scalarNode('entity_manager')->defaultValue('default')->end();
+
+        $this->addMethodsNode($root);
+
+        $root
             ->end();
     }
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         if (true === ($config['enabled'] ?? false)) {
-            $builder->setParameter('whitedigital.site_tree.enabled', $config['enabled']);
+            foreach ((new Functions())->makeOneDimension(['whitedigital.site_tree' => $config]) as $key => $value) {
+                $builder->setParameter($key, $value);
+            }
 
             $types = [
                 'html' => [
@@ -71,8 +88,15 @@ class SiteTreeBundle extends AbstractBundle
                     'entity' => $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type),
                 ];
             }
-
             $builder->setParameter('whitedigital.site_tree.types', $types);
+
+            $allowed = [];
+            foreach ($config['allowed_methods'] as $method => $enabled) {
+                if (true === $enabled) {
+                    $allowed[] = $method;
+                }
+            }
+            $builder->setParameter('whitedigital.site_tree.allowed_methods', $allowed);
 
             $container->import('../config/services.php');
         }
@@ -104,5 +128,32 @@ class SiteTreeBundle extends AbstractBundle
                 ],
             ]);
         }
+    }
+
+    private function filterKeyStartsWith(array $input, string $startsWith): array
+    {
+        return array_values(array_filter(array: $input, callback: static fn ($key) => str_starts_with(haystack: (string) $key, needle: $startsWith), mode: ARRAY_FILTER_USE_KEY));
+    }
+
+    private function addMethodsNode(ArrayNodeDefinition $node): void
+    {
+        $c = $node
+            ->children()
+            ->arrayNode('allowed_methods')
+            ->addDefaultsIfNotSet()
+            ->children();
+
+        foreach ($this->filterKeyStartsWith((new ReflectionClass(objectOrClass: Request::class))->getConstants(filter: ReflectionClassConstant::IS_PUBLIC), 'METHOD_') as $method) {
+            $default = false;
+            if (Request::METHOD_GET === $method) {
+                $default = true;
+            }
+            $c->booleanNode($method)->defaultValue($default)->end();
+        }
+
+        $c
+            ->end()
+            ->end()
+            ->end();
     }
 }

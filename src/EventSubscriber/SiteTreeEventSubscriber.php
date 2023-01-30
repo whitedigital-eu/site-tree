@@ -28,6 +28,7 @@ use WhiteDigital\SiteTree\Functions;
 
 use function filter_var;
 use function implode;
+use function in_array;
 use function str_starts_with;
 
 use const FILTER_SANITIZE_URL;
@@ -35,6 +36,8 @@ use const FILTER_VALIDATE_URL;
 
 final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 {
+    private Functions $functions;
+
     public function __construct(
         private Environment $twig,
         private EntityManagerInterface $em,
@@ -42,6 +45,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
     ) {
+        $this->functions = new Functions($this->em, $this->bag, $this->translator, $this->em->getRepository(SiteTree::class));
     }
 
     public static function getSubscribedEvents(): array
@@ -78,13 +82,16 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             }
         }
 
-        $functions = new Functions($this->em, $this->bag, $this->translator, $this->em->getRepository(SiteTree::class));
+        if (($allowed = $this->bag->get('whitedigital.site_tree.allowed_methods')) && !in_array($request->getMethod(), $allowed, true)) {
+            throw $this->getException($request, new MethodNotAllowedException($allowed));
+        }
+
         $response = new Response();
 
         $found = null;
 
         try {
-            $found = $functions->findContentType($requestEvent->getRequest()->getPathInfo());
+            $found = $this->functions->findContentType($requestEvent->getRequest()->getPathInfo());
         } catch (NotFoundHttpException) {
             $response = new Response(status: Response::HTTP_NOT_FOUND);
         }
@@ -112,6 +119,13 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         $requestEvent->setResponse($response);
     }
 
+    private function getException(Request $request, MethodNotAllowedException $exception): MethodNotAllowedHttpException
+    {
+        $message = $this->translator->trans('method_not_allowed', ['method' => $request->getMethod(), 'uri' => $request->getUriForPath($request->getPathInfo()), 'allowed' => implode(', ', $exception->getAllowedMethods())], domain: 'SiteTree');
+
+        return new MethodNotAllowedHttpException($exception->getAllowedMethods(), $message, $exception);
+    }
+
     private function onKernelRequestSymfony(Request $request): void
     {
         if ($request->attributes->has('_controller')) {
@@ -129,9 +143,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (MethodNotAllowedException $e) {
-            $message = $this->translator->trans('method_not_allowed', ['method' => $request->getMethod(), 'uri' => $request->getUriForPath($request->getPathInfo()), 'allowed' => implode(', ', $e->getAllowedMethods())], domain: 'SiteTree');
-
-            throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
+            throw $this->getException($request, $e);
         }
     }
 }
