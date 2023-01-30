@@ -72,7 +72,7 @@ class SiteTreeResource extends BaseResource
     public mixed $id = null;
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
-    public ?SiteTreeResource $root = null;
+    public ?self $root = null;
 
     #[Groups([self::ITEM, self::READ, ])]
     public ?int $level = null;
@@ -89,7 +89,7 @@ class SiteTreeResource extends BaseResource
     public bool $isVisible = true;
 
     #[Groups([self::PATCH, self::WRITE, ])]
-    public ?SiteTreeResource $parent = null;
+    public ?self $parent = null;
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
@@ -111,7 +111,7 @@ class SiteTreeResource extends BaseResource
     #[Assert\NotBlank]
     public ?string $type = null;
 
-    /** @var SiteTreeResource[]|null */
+    /** @var self[]|null */
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[SkipCircularReferenceCheck]
     public ?array $children = null;

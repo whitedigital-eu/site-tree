@@ -11,7 +11,7 @@ use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 class Html extends AbstractNodeEntity
 {
     #[ORM\Column(nullable: true)]
-    private ?string $content = null;
+    protected ?string $content = null;
 
     public function getContent(): ?string
     {

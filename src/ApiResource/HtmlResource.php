@@ -66,6 +66,7 @@ class HtmlResource extends BaseResource
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\Type(type: Type::BUILTIN_TYPE_BOOL)]
+    #[Assert\NotBlank]
     public ?bool $isActive = null;
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]

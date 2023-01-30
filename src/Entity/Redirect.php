@@ -11,10 +11,10 @@ use WhiteDigital\SiteTree\ApiResource\RedirectResource;
 class Redirect extends AbstractNodeEntity
 {
     #[ORM\Column(nullable: false)]
-    private ?int $code = null;
+    protected ?int $code = null;
 
     #[ORM\Column(nullable: false)]
-    private ?string $content = null;
+    protected ?string $content = null;
 
     public function getContent(): ?string
     {

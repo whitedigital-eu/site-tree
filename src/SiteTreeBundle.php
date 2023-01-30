@@ -59,7 +59,8 @@ class SiteTreeBundle extends AbstractBundle
                 ->end()
             ->end()
             ->scalarNode('entity_prefix')->defaultValue('App\\Entity')->end()
-            ->scalarNode('entity_manager')->defaultValue('default')->end();
+            ->scalarNode('entity_manager')->defaultValue('default')->end()
+            ->booleanNode('enable_resources')->defaultTrue()->end();
 
         $this->addMethodsNode($root);
 

@@ -23,47 +23,47 @@ class SiteTree extends BaseEntity
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, fetch: 'EAGER')]
     #[ORM\OrderBy(['left' => Criteria::ASC])]
-    private Collection $children;
+    protected Collection $children;
 
     #[Gedmo\TreeParent]
     #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER', inversedBy: 'children')]
     #[ORM\JoinColumn(referencedColumnName: 'id')]
-    private ?SiteTree $parent = null;
+    protected ?SiteTree $parent = null;
 
     #[ORM\Column(nullable: false)]
-    private ?string $type = null;
+    protected ?string $type = null;
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(name: 'lvl', nullable: false)]
-    private int $level;
+    protected int $level;
 
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', nullable: false)]
-    private int $left;
+    protected int $left;
 
     #[Gedmo\TreeRight]
     #[ORM\Column(name: 'rgt', nullable: false)]
-    private int $right;
+    protected int $right;
 
     #[Gedmo\TreeRoot]
     #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(referencedColumnName: 'id')]
-    private ?SiteTree $root = null;
+    protected ?SiteTree $root = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $isVisible = null;
+    protected ?bool $isVisible = null;
 
     #[ORM\Column(nullable: true)]
-    private ?string $title = null;
+    protected ?string $title = null;
 
     #[ORM\Column(nullable: true)]
-    private ?string $slug = null;
+    protected ?string $slug = null;
 
     #[ORM\Column(nullable: true)]
-    private ?string $metaTitle = null;
+    protected ?string $metaTitle = null;
 
     #[ORM\Column(nullable: true)]
-    private ?string $metaDescription = null;
+    protected ?string $metaDescription = null;
 
     public function __construct()
     {

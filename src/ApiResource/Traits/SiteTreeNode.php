@@ -10,11 +10,9 @@ use WhiteDigital\SiteTree\Validator\Constraints\SiteTreeNotUsedInActiveItem;
 
 trait SiteTreeNode
 {
-    private const EXAMPLE = ['example' => '/api/wd/st/site_trees/1', ];
-
     #[Groups([self::READ, self::ITEM, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
-    #[ApiProperty(openapiContext: self::EXAMPLE)]
+    #[ApiProperty(openapiContext: ['example' => '/api/wd/st/site_trees/1', ])]
     #[SiteTreeNotUsedInActiveItem]
     public ?SiteTreeResource $node = null;
 }
