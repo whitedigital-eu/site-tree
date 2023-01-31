@@ -36,6 +36,12 @@ use const FILTER_VALIDATE_URL;
 
 final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 {
+    private const EXCLUDES = [
+        '/api',
+        '/_wdt',
+        '/_error',
+        '/reset-password-requests',
+    ];
     private Functions $functions;
 
     public function __construct(
@@ -63,13 +69,16 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $requestEvent): void
     {
-        $request = $requestEvent->getRequest();
         if (!$requestEvent->isMainRequest()) {
             return;
         }
 
-        if (str_starts_with($request->getPathInfo(), '/api')) {
-            return;
+        $request = $requestEvent->getRequest();
+
+        foreach (self::EXCLUDES as $exclude) {
+            if (str_starts_with($request->getPathInfo(), $exclude)) {
+                return;
+            }
         }
 
         try {
