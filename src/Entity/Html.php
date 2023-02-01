@@ -2,6 +2,7 @@
 
 namespace WhiteDigital\SiteTree\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\SiteTree\ApiResource\HtmlResource;
@@ -10,7 +11,7 @@ use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 #[Mapping(HtmlResource::class)]
 class Html extends AbstractNodeEntity
 {
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $content = null;
 
     public function getContent(): ?string

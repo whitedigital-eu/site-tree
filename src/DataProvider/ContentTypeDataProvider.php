@@ -9,7 +9,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
@@ -37,11 +36,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        try {
-            $found = $this->functions->findContentType($uriVariables['id']);
-        } catch (NotFoundHttpException $exception) {
-            throw new $exception();
-        }
+        $found = $this->functions->findContentType($uriVariables['id']);
 
         $resource = new ContentTypeResource();
         $resource->nodeId = $found->getId();

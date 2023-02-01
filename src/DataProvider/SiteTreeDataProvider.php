@@ -20,10 +20,6 @@ final readonly class SiteTreeDataProvider extends AbstractDataProvider
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof CollectionOperationInterface) {
-            if ('roots' === $operation->getName()) {
-                return $this->getRootsCollection($operation, $context);
-            }
-
             return $this->getCollection($operation, $context);
         }
 
@@ -40,10 +36,11 @@ final readonly class SiteTreeDataProvider extends AbstractDataProvider
         return SiteTreeResource::create($entity, $context);
     }
 
-    protected function getRootsCollection(?Operation $operation = null, array $context = []): array|object
+    protected function getCollection(Operation $operation, array $context = []): array|object
     {
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->select('e')->from($resourceClass = $this->getEntityClass($operation), 'e')->where('e.level = 0');
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        $queryBuilder = $this->entityManager->getRepository($resourceClass = $this->getEntityClass($operation))->getChildrenQueryBuilder();
+        $queryBuilder->orderBy('node.root, node.left');
 
         $this->authorizationService->limitGetCollection($resourceClass, $queryBuilder);
 

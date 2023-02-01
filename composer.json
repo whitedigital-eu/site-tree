@@ -31,9 +31,10 @@
         "symfony/validator": ">=6.2",
         "twig/twig": "^3",
         "whitedigital-eu/api-resource": ">=0.3",
-        "whitedigital-eu/entity-resource-mapper-bundle": ">=0.21.5"
+        "whitedigital-eu/entity-resource-mapper-bundle": ">=0.21.6"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "*",
         "friendsofphp/php-cs-fixer": "*",
         "roave/security-advisories": "dev-latest",
         "whitedigital-eu/config-pack": "*"

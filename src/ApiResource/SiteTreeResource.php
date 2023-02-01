@@ -10,13 +10,17 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
 use ApiPlatform\Serializer\Filter\GroupFilter;
-use Doctrine\Common\Collections\Criteria;
+use ArrayObject;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceDateFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\SiteTreeDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\SiteTreeDataProvider;
@@ -35,12 +39,65 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 normalizationContext: ['groups' => [self::ITEM, ], ],
             ),
             new GetCollection(
+                paginationEnabled: false,
+                paginationClientEnabled: false,
                 normalizationContext: ['groups' => [self::READ, ], ],
             ),
-            new GetCollection(
-                uriTemplate: '/site_trees/roots',
-                normalizationContext: ['groups' => [self::READ, ], ],
-                name: 'roots',
+            new Patch(
+                uriTemplate: '/site_trees/{id}/up',
+                requirements: ['id' => '\d+', ],
+                status: Response::HTTP_NO_CONTENT,
+                openapi: new Model\Operation(
+                    summary: 'Move node within level up by 1 position',
+                    description: 'Move node within level up by 1 position',
+                    requestBody: new Model\RequestBody(
+                        content: new ArrayObject(),
+                        required: false,
+                    ),
+                ),
+                denormalizationContext: ['groups' => [self::MOVE, ], ],
+            ),
+            new Patch(
+                uriTemplate: '/site_trees/{id}/down',
+                requirements: ['id' => '\d+', ],
+                status: Response::HTTP_NO_CONTENT,
+                openapi: new Model\Operation(
+                    summary: 'Move node within level down by 1 position',
+                    description: 'Move node within level down by 1 position',
+                    requestBody: new Model\RequestBody(
+                        content: new ArrayObject(),
+                        required: false,
+                    ),
+                ),
+                denormalizationContext: ['groups' => [self::MOVE, ], ],
+            ),
+            new Patch(
+                uriTemplate: '/site_trees/{id}/top',
+                requirements: ['id' => '\d+', ],
+                status: Response::HTTP_NO_CONTENT,
+                openapi: new Model\Operation(
+                    summary: 'Move node within level up to top position',
+                    description: 'Move node within level up to top position',
+                    requestBody: new Model\RequestBody(
+                        content: new ArrayObject(),
+                        required: false,
+                    ),
+                ),
+                denormalizationContext: ['groups' => [self::MOVE, ], ],
+            ),
+            new Patch(
+                uriTemplate: '/site_trees/{id}/bottom',
+                requirements: ['id' => '\d+', ],
+                status: Response::HTTP_NO_CONTENT,
+                openapi: new Model\Operation(
+                    summary: 'Move node within level down to bottom position',
+                    description: 'Move node within level down to bottom position',
+                    requestBody: new Model\RequestBody(
+                        content: new ArrayObject(),
+                        required: false,
+                    ),
+                ),
+                denormalizationContext: ['groups' => [self::MOVE, ], ],
             ),
             new Patch(
                 requirements: ['id' => '\d+', ],
@@ -53,11 +110,12 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
         routePrefix: '/wd/st',
         normalizationContext: ['groups' => [self::ITEM, self::READ, ], ],
         denormalizationContext: ['groups' => [self::WRITE, ], ],
-        order: ['root' => Criteria::ASC, 'left' => Criteria::ASC, ],
         provider: SiteTreeDataProvider::class,
         processor: SiteTreeDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
+    ApiFilter(ResourceDateFilter::class, properties: ['createdAt', 'updatedAt', ]),
+    ApiFilter(ResourceNumericFilter::class, properties: ['level']),
 ]
 #[Mapping(SiteTree::class)]
 class SiteTreeResource extends BaseResource
@@ -66,6 +124,7 @@ class SiteTreeResource extends BaseResource
     use ARTraits\Groups;
 
     public const PREFIX = 'site_tree:';
+    public const MOVE = self::PREFIX . 'move';
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::ITEM, self::READ, ])]
@@ -97,7 +156,6 @@ class SiteTreeResource extends BaseResource
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 3)]
     public ?string $slug = null;
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]

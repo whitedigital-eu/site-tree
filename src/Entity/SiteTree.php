@@ -14,6 +14,7 @@ use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
 #[ORM\Entity(repositoryClass: SiteTreeRepository::class)]
+#[ORM\UniqueConstraint(fields: ['level', 'slug', ])]
 #[Gedmo\Tree(type: 'nested')]
 #[Mapping(SiteTreeResource::class)]
 class SiteTree extends BaseEntity
@@ -21,12 +22,12 @@ class SiteTree extends BaseEntity
     use Id;
     use Traits\Active;
 
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, fetch: 'EAGER')]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     #[ORM\OrderBy(['left' => Criteria::ASC])]
     protected Collection $children;
 
     #[Gedmo\TreeParent]
-    #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER', inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
     #[ORM\JoinColumn(referencedColumnName: 'id')]
     protected ?SiteTree $parent = null;
 
@@ -46,17 +47,17 @@ class SiteTree extends BaseEntity
     protected int $right;
 
     #[Gedmo\TreeRoot]
-    #[ORM\ManyToOne(targetEntity: self::class, fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: self::class)]
     #[ORM\JoinColumn(referencedColumnName: 'id')]
     protected ?SiteTree $root = null;
 
     #[ORM\Column(nullable: true)]
     protected ?bool $isVisible = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     protected ?string $title = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     protected ?string $slug = null;
 
     #[ORM\Column(nullable: true)]

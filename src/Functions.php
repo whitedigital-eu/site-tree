@@ -45,9 +45,14 @@ final readonly class Functions
         } else {
             $end = null;
         }
+        $count = substr_count($slug, '/');
+
+        if ('' === $slug) {
+            $slug = '/';
+        }
 
         $found = null;
-        foreach ($this->repository->findAllActiveByLevel(substr_count($slug, '/')) as $item) {
+        foreach ($this->repository->findAllActiveByLevel($count) as $item) {
             if ($this->repository->getSlug($item) === $slug) {
                 $found = $item;
             }
@@ -59,10 +64,14 @@ final readonly class Functions
 
         if (null !== $end) {
             $types = $this->bag->get('whitedigital.site_tree.types');
-            $item = $this->em->getRepository($types[$found->getType()]['entity'])->find($end);
+            $entity = $types[$found->getType()]['entity'] ?? null;
 
-            if (null !== $item) {
-                return $item;
+            if (null !== $entity) {
+                $item = $this->em->getRepository($entity)->find($end);
+
+                if (null !== $item) {
+                    return $item;
+                }
             }
 
             throw new NotFoundHttpException($this->translator->trans(Response::$statusTexts[Response::HTTP_NOT_FOUND], domain: 'SiteTree'));

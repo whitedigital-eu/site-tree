@@ -26,6 +26,7 @@ use WhiteDigital\SiteTree\Entity\Redirect;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Functions;
 
+use function array_merge;
 use function filter_var;
 use function implode;
 use function in_array;
@@ -38,9 +39,11 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 {
     private const EXCLUDES = [
         '/api',
+    ];
+    private const DEV_EXCLUDES = [
         '/_wdt',
         '/_error',
-        '/reset-password-requests',
+        '/_profiler',
     ];
     private Functions $functions;
 
@@ -75,7 +78,12 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         $request = $requestEvent->getRequest();
 
-        foreach (self::EXCLUDES as $exclude) {
+        $excludes = self::EXCLUDES;
+        if ('dev' === $this->bag->get('kernel.environment')) {
+            $excludes = array_merge(self::EXCLUDES, self::DEV_EXCLUDES);
+        }
+
+        foreach ($excludes as $exclude) {
             if (str_starts_with($request->getPathInfo(), $exclude)) {
                 return;
             }
@@ -96,7 +104,6 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         }
 
         $response = new Response();
-
         $found = null;
 
         try {
@@ -122,7 +129,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             $response = new Response(status: Response::HTTP_NOT_FOUND);
         }
 
-        $view = $this->twig->render('index.html');
+        $view = $this->twig->render($this->bag->get('whitedigital.site_tree.index_template'));
         $response->setContent($view);
 
         $requestEvent->setResponse($response);

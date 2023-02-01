@@ -2,6 +2,7 @@
 
 namespace WhiteDigital\SiteTree\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query;
@@ -61,6 +62,7 @@ class SiteTreeRepository extends NestedTreeRepository
                 ->select('st')
                 ->andWhere('st.id = :id')
                 ->setParameter('id', $id)
+                ->orderBy('st.root, st.left', Criteria::ASC)
                 ->getQuery()
                 ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true)
                 ->getOneOrNullResult();
