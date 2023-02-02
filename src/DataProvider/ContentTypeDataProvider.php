@@ -16,16 +16,18 @@ use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Functions;
 
+use function array_merge;
+
 final readonly class ContentTypeDataProvider implements ProviderInterface
 {
     private Functions $functions;
 
     public function __construct(
-        ParameterBagInterface $bag,
+        private ParameterBagInterface $bag,
         TranslatorInterface $translator,
-        EntityManagerInterface $em,
+        private EntityManagerInterface $em,
     ) {
-        $this->functions = new Functions($em, $bag, $translator, $em->getRepository(SiteTree::class));
+        $this->functions = new Functions($this->em, $this->bag, $translator, $this->em->getRepository(SiteTree::class));
     }
 
     /**
@@ -38,7 +40,24 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
     {
         $found = $this->functions->findContentType($uriVariables['id']);
 
+        $entities = [[]];
         $resource = new ContentTypeResource();
+        if (!$found instanceof SiteTree) {
+            $resource->resource = $found;
+            $found = $found->getNode();
+        } else {
+            foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
+                $items = $this->em->getRepository($type['entity'])->findBy(['node' => $found, 'isActive' => true]);
+                if ([] !== $items) {
+                    $entities[] = $items;
+                }
+            }
+        }
+        $entities = array_merge(...$entities);
+        if ([] !== $entities) {
+            $resource->resources = $entities;
+        }
+
         $resource->nodeId = $found->getId();
         $resource->node = SiteTreeResource::create($found, $context);
         $resource->type = $found->getType();

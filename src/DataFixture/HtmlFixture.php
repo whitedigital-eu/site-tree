@@ -9,6 +9,8 @@ use Faker\Factory;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WhiteDigital\SiteTree\Entity\Html;
 
+use function array_rand;
+
 class HtmlFixture extends Fixture implements DependentFixtureInterface
 {
     public function __construct(private readonly ParameterBagInterface $bag)
@@ -27,15 +29,21 @@ class HtmlFixture extends Fixture implements DependentFixtureInterface
         $factory = Factory::create($this->bag->get('stof_doctrine_extensions.default_locale'));
         $factory->seed('whitedigital');
 
-        foreach (SiteTreeFixture::$references['html'] ?? [] as $reference) {
+        for ($i = 0; $i < 10; $i++) {
             /** @noinspection PhpParamsInspection */
             $fixture = (new Html())
                 ->setIsActive(true)
                 ->setContent($factory->randomHtml())
-                ->setNode($this->getReference($reference));
+                ->setNode($this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html'])));
+
             $manager->persist($fixture);
         }
 
         $manager->flush();
+    }
+
+    private function randomArrayKey(array $array): string|int|array
+    {
+        return array_rand(array: $array);
     }
 }

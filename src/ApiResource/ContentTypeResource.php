@@ -4,6 +4,7 @@ namespace WhiteDigital\SiteTree\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
 
 #[
@@ -26,4 +27,9 @@ class ContentTypeResource
     public ?SiteTreeResource $node = null;
 
     public ?string $type = null;
+
+    public mixed $resource = null;
+
+    /** @var BaseResource[]|null */
+    public ?array $resources = null;
 }
