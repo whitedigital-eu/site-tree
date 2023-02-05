@@ -11,6 +11,7 @@ use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
@@ -26,6 +27,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         private ParameterBagInterface $bag,
         TranslatorInterface $translator,
         private EntityManagerInterface $em,
+        private AuthorizationService $authorizationService,
     ) {
         $this->functions = new Functions($this->em, $this->bag, $translator, $this->em->getRepository(SiteTree::class));
     }
@@ -39,6 +41,8 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $found = $this->functions->findContentType($uriVariables['id']);
+
+        $this->authorizationService->authorizeSingleObject($found, AuthorizationService::ITEM_GET);
 
         $entities = [[]];
         $resource = new ContentTypeResource();

@@ -42,7 +42,7 @@ final readonly class SiteTreeDataProvider extends AbstractDataProvider
         $queryBuilder = $this->entityManager->getRepository($resourceClass = $this->getEntityClass($operation))->getChildrenQueryBuilder();
         $queryBuilder->orderBy('node.root, node.left');
 
-        $this->authorizationService->limitGetCollection($resourceClass, $queryBuilder);
+        $this->authorizationService->limitGetCollection($operation->getClass(), $queryBuilder);
 
         return $this->applyFilterExtensionsToCollection($queryBuilder, new QueryNameGenerator(), $operation, $context);
     }
