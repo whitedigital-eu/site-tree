@@ -67,10 +67,11 @@ class RedirectResource extends BaseResource
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     #[Assert\Type(type: Type::BUILTIN_TYPE_BOOL)]
+    #[Assert\NotNull]
     public ?bool $isActive = null;
 
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
-    #[Assert\NotBlank]
+    #[Assert\NotNull]
     #[Assert\Choice([Response::HTTP_MOVED_PERMANENTLY, Response::HTTP_FOUND, Response::HTTP_TEMPORARY_REDIRECT, Response::HTTP_PERMANENTLY_REDIRECT, ])]
     public ?int $code = null;
 
