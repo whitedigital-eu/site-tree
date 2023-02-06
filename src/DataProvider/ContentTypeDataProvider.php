@@ -7,16 +7,20 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Throwable;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Functions;
 
+use function array_key_exists;
 use function array_merge;
 
 final readonly class ContentTypeDataProvider implements ProviderInterface
@@ -42,6 +46,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
     {
         $found = $this->functions->findContentType($uriVariables['id']);
 
+        $this->authorizationService->setAuthorizationOverride(fn () => $this->override($operation->getClass()));
         $this->authorizationService->authorizeSingleObject($found, AuthorizationService::ITEM_GET);
 
         $entities = [[]];
@@ -67,5 +72,21 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         $resource->type = $found->getType();
 
         return $resource;
+    }
+
+    private function override(string $class): bool
+    {
+        try {
+            $attributes = (new ReflectionClass($this->authorizationService))->getProperty('resources')->getValue($this->authorizationService)[$class];
+        } catch (Throwable) {
+            return false;
+        }
+
+        $allowed = array_merge($attributes[AuthorizationService::ALL] ?? [], $attributes[AuthorizationService::ITEM_GET] ?? []);
+        if ([] !== $allowed && array_key_exists(AuthenticatedVoter::PUBLIC_ACCESS, $allowed)) {
+            return true;
+        }
+
+        return false;
     }
 }

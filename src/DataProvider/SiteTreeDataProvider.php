@@ -10,6 +10,7 @@ use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\ApiResource\Php82\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
+use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 
 final readonly class SiteTreeDataProvider extends AbstractDataProvider
@@ -39,9 +40,10 @@ final readonly class SiteTreeDataProvider extends AbstractDataProvider
     protected function getCollection(Operation $operation, array $context = []): array|object
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $queryBuilder = $this->entityManager->getRepository($resourceClass = $this->getEntityClass($operation))->getChildrenQueryBuilder();
+        $queryBuilder = $this->entityManager->getRepository($this->getEntityClass($operation))->getChildrenQueryBuilder();
         $queryBuilder->orderBy('node.root, node.left');
 
+        $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::COL_GET, $operation->getClass()));
         $this->authorizationService->limitGetCollection($operation->getClass(), $queryBuilder);
 
         return $this->applyFilterExtensionsToCollection($queryBuilder, new QueryNameGenerator(), $operation, $context);
