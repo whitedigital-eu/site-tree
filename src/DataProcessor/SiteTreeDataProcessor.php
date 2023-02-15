@@ -42,10 +42,10 @@ final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
         if (!$operation instanceof DeleteOperationInterface) {
             if ($operation instanceof Patch) {
                 if (null === ($entity = $this->move($operation, $data, $context))) {
-                    $entity = $this->patch($data, $context);
+                    $entity = $this->patch($data, $operation, $context);
                 }
             } else {
-                $entity = $this->post($data, $context);
+                $entity = $this->post($data, $operation, $context);
             }
 
             $this->flushAndRefresh($entity);
@@ -56,7 +56,7 @@ final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
             return $this->createResource($entity, $context);
         }
 
-        $this->remove($data);
+        $this->remove($data, $operation);
 
         return null;
     }
