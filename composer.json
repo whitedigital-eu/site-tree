@@ -28,6 +28,7 @@
         "symfony/routing": ">=6.2",
         "symfony/serializer": ">=6.2",
         "symfony/translation": ">=6.2",
+        "symfony/twig-bundle": ">=6.2",
         "symfony/validator": ">=6.2",
         "twig/twig": "^3",
         "whitedigital-eu/api-resource": ">=0.3",
