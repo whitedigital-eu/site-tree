@@ -131,7 +131,7 @@ class SiteTreeResource extends BaseResource
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public ?self $root = null;
 
-    #[Groups([self::ITEM, self::READ, ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public ?int $level = null;
 
     #[Groups([self::ITEM, self::READ, ])]

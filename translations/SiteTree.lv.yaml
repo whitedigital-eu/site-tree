@@ -1,0 +1,4 @@
+method_not_allowed: 'Nav atrasts ceļš "%method% %uri%": Metode nav atļauta (Autļautās metodes: %allowed%)'
+Not Found: 'Nav Atrasts'
+invalid_parameter_list_allowed: 'Nekorekts tips: %parameter%. Atļautie tipi: %allowed%'
+tree_node_already_exists: 'Viena līmeņa ietvaros slug ir jābūt unikāla, slug "%slug%" %level% līmenī jau eksistē'

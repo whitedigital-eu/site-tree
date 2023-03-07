@@ -137,7 +137,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
     private function getException(Request $request, MethodNotAllowedException $exception): MethodNotAllowedHttpException
     {
-        $message = $this->translator->trans('method_not_allowed', ['method' => $request->getMethod(), 'uri' => $request->getUriForPath($request->getPathInfo()), 'allowed' => implode(', ', $exception->getAllowedMethods())], domain: 'SiteTree');
+        $message = $this->translator->trans('method_not_allowed', ['%method%' => $request->getMethod(), '%uri%' => $request->getUriForPath($request->getPathInfo()), '%allowed%' => implode(', ', $exception->getAllowedMethods())], domain: 'SiteTree');
 
         return new MethodNotAllowedHttpException($exception->getAllowedMethods(), $message, $exception);
     }

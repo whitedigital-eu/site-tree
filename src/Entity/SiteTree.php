@@ -14,7 +14,6 @@ use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
 #[ORM\Entity(repositoryClass: SiteTreeRepository::class)]
-#[ORM\UniqueConstraint(fields: ['level', 'slug', ])]
 #[Gedmo\Tree(type: 'nested')]
 #[Mapping(SiteTreeResource::class)]
 class SiteTree extends BaseEntity

@@ -1,0 +1,4 @@
+method_not_allowed: 'No route found for "%method% %uri%": Method Not Allowed (Allow: %allowed%)'
+Not Found: 'Not Found'
+invalid_parameter_list_allowed: 'Invalid type: %parameter%. Allowed types: %allowed%'
+tree_node_already_exists: 'Slug must be unique within same level, slug "%slug%" already found in level %level%'

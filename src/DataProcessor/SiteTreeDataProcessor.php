@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Patch;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
@@ -73,6 +74,11 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
             /* @var SiteTreeRepository $repo */
             $entity->setRoot($repo->getRootById($existingEntity->getId()));
             $entity->setParent($repo->getParentById($existingEntity->getId()));
+        }
+
+        $level = null === $entity->getParent() ? 0 : $entity->getParent()->getLevel() + 1;
+        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy(['level' => $level, 'slug' => $entity->getSlug()])) {
+            throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $entity->getSlug()], domain: 'SiteTree'));
         }
 
         return $entity;
