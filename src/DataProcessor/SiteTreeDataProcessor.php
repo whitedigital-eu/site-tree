@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Patch;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
@@ -23,6 +24,7 @@ use function end;
 use function explode;
 use function in_array;
 use function preg_match;
+use function rtrim;
 use function str_replace;
 
 final class SiteTreeDataProcessor extends AbstractDataProcessor
@@ -77,8 +79,14 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
         }
 
         $level = null === $entity->getParent() ? 0 : $entity->getParent()->getLevel() + 1;
-        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy(['level' => $level, 'slug' => $entity->getSlug()])) {
-            throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $entity->getSlug()], domain: 'SiteTree'));
+        $slug = $entity->getSlug();
+
+        if (0 < $level && '' === rtrim($slug, '/')) {
+            throw new BadRequestHttpException($this->translator->trans('empty_slug_above_zero', domain: 'SiteTree'));
+        }
+
+        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy(['level' => $level, 'slug' => $slug])) {
+            throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $slug], domain: 'SiteTree'));
         }
 
         return $entity;
