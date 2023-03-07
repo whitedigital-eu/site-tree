@@ -16,7 +16,6 @@ use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
                 requirements: ['id' => '.+', ],
             ),
         ],
-        routePrefix: '/wd/st',
         provider: ContentTypeDataProvider::class,
     )
 ]

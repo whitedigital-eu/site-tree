@@ -16,7 +16,6 @@ use ArrayObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceDateFilter;
@@ -107,7 +106,6 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
         ],
-        routePrefix: '/wd/st',
         normalizationContext: ['groups' => [self::ITEM, self::READ, ], ],
         denormalizationContext: ['groups' => [self::WRITE, ], ],
         provider: SiteTreeDataProvider::class,
@@ -120,8 +118,8 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
 #[Mapping(SiteTree::class)]
 class SiteTreeResource extends BaseResource
 {
-    use ARTraits\CreatedUpdated;
-    use ARTraits\Groups;
+    use Traits\CreatedUpdated;
+    use Traits\Groups;
 
     public const PREFIX = 'site_tree:';
     public const MOVE = self::PREFIX . 'move';

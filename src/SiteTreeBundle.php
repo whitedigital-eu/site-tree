@@ -6,13 +6,14 @@ use ReflectionClass;
 use ReflectionClassConstant;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
-use WhiteDigital\ApiResource\DependencyInjections\Traits\DefineApiPlatformMappings;
-use WhiteDigital\ApiResource\DependencyInjections\Traits\DefineOrmMappings;
-use WhiteDigital\ApiResource\Functions;
+use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineApiPlatformMappings;
+use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineOrmMappings;
+use WhiteDigital\EntityResourceMapper\EntityResourceMapperBundle;
 use WhiteDigital\SiteTree\Entity\Html;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
@@ -47,7 +48,6 @@ class SiteTreeBundle extends AbstractBundle
             ->rootNode();
 
         $root
-            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
             ->arrayNode('types')
@@ -61,7 +61,7 @@ class SiteTreeBundle extends AbstractBundle
             ->scalarNode('entity_prefix')->defaultValue('App\\Entity')->end()
             ->scalarNode('entity_manager')->defaultValue('default')->end()
             ->booleanNode('enable_resources')->defaultTrue()->end()
-            ->scalarNode('index_template')->isRequired()->end();
+            ->scalarNode('index_template')->defaultNull()->end();
 
         $this->addMethodsNode($root);
 
@@ -71,39 +71,39 @@ class SiteTreeBundle extends AbstractBundle
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        if (true === ($config['enabled'] ?? false)) {
-            foreach ((new Functions())->makeOneDimension(['whitedigital.site_tree' => $config]) as $key => $value) {
-                $builder->setParameter($key, $value);
-            }
-
-            $types = [
-                'html' => [
-                    'entity' => Html::class,
-                ],
-                'redirect' => [
-                    'entity' => Redirect::class,
-                ],
-            ];
-
-            foreach ($config['types'] as $type => $value) {
-                $types[$type] = [
-                    'entity' => $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type),
-                ];
-            }
-            $builder->setParameter('whitedigital.site_tree.types', $types);
-
-            $allowed = [];
-            foreach ($config['allowed_methods'] as $method => $enabled) {
-                if (true === $enabled) {
-                    $allowed[] = $method;
-                }
-            }
-            $builder->setParameter('whitedigital.site_tree.allowed_methods', $allowed);
-
-            $container->import('../config/services.php');
+        foreach (EntityResourceMapperBundle::makeOneDimension(['whitedigital.site_tree' => $config]) as $key => $value) {
+            $builder->setParameter($key, $value);
         }
 
-        $container->import('../config/decorator.php');
+        if (null === $builder->getParameter('whitedigital.site_tree.index_template')) {
+            throw new InvalidConfigurationException('"index_template" parameter must be set');
+        }
+
+        $types = [
+            'html' => [
+                'entity' => Html::class,
+            ],
+            'redirect' => [
+                'entity' => Redirect::class,
+            ],
+        ];
+
+        foreach ($config['types'] as $type => $value) {
+            $types[$type] = [
+                'entity' => $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type),
+            ];
+        }
+        $builder->setParameter('whitedigital.site_tree.types', $types);
+
+        $allowed = [];
+        foreach ($config['allowed_methods'] as $method => $enabled) {
+            if (true === $enabled) {
+                $allowed[] = $method;
+            }
+        }
+        $builder->setParameter('whitedigital.site_tree.allowed_methods', $allowed);
+
+        $container->import('../config/services.php');
     }
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
@@ -111,25 +111,23 @@ class SiteTreeBundle extends AbstractBundle
         $siteTree = array_merge_recursive(...$builder->getExtensionConfig('site_tree') ?? []);
         $audit = array_merge_recursive(...$builder->getExtensionConfig('whitedigital') ?? [])['audit'] ?? [];
 
-        if (true === ($siteTree['enabled'] ?? true)) {
-            $manager = $siteTree['entity_manager'] ?? 'default';
-            $mappings = $this->getOrmMappings($builder, $manager);
+        $manager = $siteTree['entity_manager'] ?? 'default';
+        $mappings = $this->getOrmMappings($builder, $manager);
 
-            $this->addDoctrineConfig($container, $manager, $mappings, 'SiteTree', self::MAPPINGS);
-            $this->addApiPlatformPaths($container, self::PATHS);
+        $this->addDoctrineConfig($container, $manager, $mappings, 'SiteTree', self::MAPPINGS);
+        $this->addApiPlatformPaths($container, self::PATHS);
 
-            if (true === ($audit['enabled'] ?? false)) {
-                $this->addDoctrineConfig($container, $audit['audit_entity_manager'], $mappings, 'SiteTree', self::MAPPINGS);
-            }
-
-            $container->extension('stof_doctrine_extensions', [
-                'orm' => [
-                    $manager => [
-                        'tree' => true,
-                    ],
-                ],
-            ]);
+        if (true === ($audit['enabled'] ?? false)) {
+            $this->addDoctrineConfig($container, $audit['audit_entity_manager'], $mappings, 'SiteTree', self::MAPPINGS);
         }
+
+        $container->extension('stof_doctrine_extensions', [
+            'orm' => [
+                $manager => [
+                    'tree' => true,
+                ],
+            ],
+        ]);
     }
 
     private function filterKeyStartsWith(array $input, string $startsWith): array

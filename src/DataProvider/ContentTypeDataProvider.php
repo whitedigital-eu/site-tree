@@ -7,23 +7,25 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use ReflectionClass;
 use ReflectionException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use WhiteDigital\ApiResource\Traits\Override;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
+use WhiteDigital\EntityResourceMapper\Security\Enum\GrantType;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Functions;
 
+use function array_key_exists;
 use function array_merge;
 
 final readonly class ContentTypeDataProvider implements ProviderInterface
 {
-    use Override;
-
     private Functions $functions;
 
     public function __construct(
@@ -72,5 +74,31 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         $resource->type = $found->getType();
 
         return $resource;
+    }
+
+    protected function override(string $operation, string $class): bool
+    {
+        try {
+            $property = (new ReflectionClass($this->authorizationService))->getProperty('resources')->getValue($this->authorizationService);
+        } catch (ReflectionException) {
+            return false;
+        }
+
+        if (isset($property[$class])) {
+            $attributes = $property[$class];
+        } else {
+            return false;
+        }
+
+        $allowed = array_merge($attributes[AuthorizationService::ALL] ?? [], $attributes[$operation] ?? []);
+        if ([] !== $allowed && array_key_exists(AuthenticatedVoter::PUBLIC_ACCESS, $allowed)) {
+            if (GrantType::ALL === $allowed[AuthenticatedVoter::PUBLIC_ACCESS]) {
+                return true;
+            }
+
+            throw new InvalidConfigurationException('Public access only allowed with "all" grant type');
+        }
+
+        return false;
     }
 }

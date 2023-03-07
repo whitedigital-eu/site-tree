@@ -5,11 +5,11 @@ namespace WhiteDigital\SiteTree\DataProvider;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\ApiResource\Php82\AbstractDataProvider;
+use WhiteDigital\EntityResourceMapper\DataProvider\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 
-final readonly class HtmlDataProvider extends AbstractDataProvider
+final class HtmlDataProvider extends AbstractDataProvider
 {
     /**
      * @throws ExceptionInterface

@@ -11,6 +11,6 @@ trait SiteTreeNode
 {
     #[Groups([self::READ, self::ITEM, self::PATCH, self::WRITE, ])]
     #[Assert\NotBlank]
-    #[ApiProperty(openapiContext: ['example' => '/api/wd/st/site_trees/1', ])]
+    #[ApiProperty(openapiContext: ['example' => '/api/site_trees/1', ])]
     public ?SiteTreeResource $node = null;
 }

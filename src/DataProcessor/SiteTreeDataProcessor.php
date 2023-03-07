@@ -10,7 +10,7 @@ use Doctrine\DBAL\Exception;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\ApiResource\Php82\AbstractDataProcessor;
+use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
@@ -24,7 +24,7 @@ use function in_array;
 use function preg_match;
 use function str_replace;
 
-final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
+final class SiteTreeDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {
