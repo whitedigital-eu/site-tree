@@ -16,6 +16,8 @@ use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
                 requirements: ['id' => '.+', ],
             ),
         ],
+        paginationClientEnabled: false,
+        paginationEnabled: false,
         provider: ContentTypeDataProvider::class,
     )
 ]

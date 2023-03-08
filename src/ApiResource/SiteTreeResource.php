@@ -18,7 +18,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
-use WhiteDigital\EntityResourceMapper\Filters\ResourceDateFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\SiteTreeDataProcessor;
@@ -112,7 +111,6 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
         processor: SiteTreeDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceDateFilter::class, properties: ['createdAt', 'updatedAt', ]),
     ApiFilter(ResourceNumericFilter::class, properties: ['level']),
 ]
 #[Mapping(SiteTree::class)]

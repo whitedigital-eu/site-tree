@@ -14,11 +14,15 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineApiPlatformMappings;
 use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineOrmMappings;
 use WhiteDigital\EntityResourceMapper\EntityResourceMapperBundle;
+use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\Html;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
 use function array_filter;
 use function array_merge_recursive;
+use function class_exists;
+use function is_subclass_of;
+use function sprintf;
 use function str_starts_with;
 use function ucfirst;
 
@@ -89,10 +93,20 @@ class SiteTreeBundle extends AbstractBundle
         ];
 
         foreach ($config['types'] as $type => $value) {
+            $entity = $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type);
+            if (!class_exists($entity)) {
+                throw new InvalidConfigurationException(sprintf('Can\'t use type %s if entity %s does not exists', $type, $entity));
+            }
+
+            if (!is_subclass_of($entity, AbstractNodeEntity::class)) {
+                throw new InvalidConfigurationException(sprintf('Type entities must extend %s, wrong parent on %s', AbstractNodeEntity::class, $entity));
+            }
+
             $types[$type] = [
-                'entity' => $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type),
+                'entity' => $entity,
             ];
         }
+
         $builder->setParameter('whitedigital.site_tree.types', $types);
 
         $allowed = [];
