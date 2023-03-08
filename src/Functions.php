@@ -15,6 +15,7 @@ use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
 use function array_key_last;
 use function implode;
+use function in_array;
 use function is_numeric;
 use function ltrim;
 use function rtrim;
@@ -53,13 +54,13 @@ final readonly class Functions
 
         $found = null;
         foreach ($this->repository->findAllActiveByLevel($count) as $item) {
-            if ($this->repository->getSlug($item) === $slug) {
+            if (in_array($this->repository->getSlug($item), [$slug, '/' . $slug], true)) {
                 $found = $item;
             }
         }
 
         if (null === $found) {
-            throw new NotFoundHttpException($this->translator->trans(Response::$statusTexts[Response::HTTP_NOT_FOUND], domain: 'SiteTree'));
+            throw new NotFoundHttpException($this->translator->trans('named_resource_not_found', ['%resource%' => '', '%id%' => $slug], domain: 'SiteTree'));
         }
 
         if (null !== $end) {

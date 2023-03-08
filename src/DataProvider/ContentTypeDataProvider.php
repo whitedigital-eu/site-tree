@@ -11,6 +11,7 @@ use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -30,11 +31,11 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
 
     public function __construct(
         private ParameterBagInterface $bag,
-        TranslatorInterface $translator,
+        private TranslatorInterface $translator,
         private EntityManagerInterface $em,
         private AuthorizationService $authorizationService,
     ) {
-        $this->functions = new Functions($this->em, $this->bag, $translator, $this->em->getRepository(SiteTree::class));
+        $this->functions = new Functions($this->em, $this->bag, $this->translator, $this->em->getRepository(SiteTree::class));
     }
 
     /**
@@ -67,6 +68,10 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         $entities = array_merge(...$entities);
         if ([] !== $entities) {
             $resource->resources = $entities;
+        }
+
+        if ([] === $entities) {
+            throw new NotFoundHttpException($this->translator->trans('named_resource_not_found', ['%resource%' => '', '%id%' => $uriVariables['id']], domain: 'SiteTree'));
         }
 
         $resource->nodeId = $found->getId();
