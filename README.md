@@ -17,11 +17,9 @@ composer require whitedigital-eu/site-tree
 ---
 
 ### Configuration
-By default this bundle comes disabled after installation. To enable it you need to 
-configure file to be included after package checks if opened url is valid tree branch.
+Only mandatory configuration parameter is `index_template` -> file to include as response when backend has finished routing check.  
 ```yaml
 site_tree:
-    enabled: true
     index_template: index.html
 ```
 ```php
@@ -29,7 +27,6 @@ use Symfony\Config\SiteTreeConfig;
 
 return static function (SiteTreeConfig $config): void {
     $config
-        ->enabled(true)
         ->indexTemplate('index.html');
 };
 ```
@@ -55,11 +52,9 @@ To add new type, you need:
 2. Configure type in configuration:
 ```yaml
 site_tree:
-    enabled: true
     index_template: index.html
     types:
-        news:
-            entity: ~
+        news: ~
         news2:
             entity: App\Entity\NotNews
 ```
@@ -69,7 +64,6 @@ use App\Entity\NotNews;
 
 return static function (SiteTreeConfig $config): void {
     $config
-        ->enabled(true)
         ->indexTemplate('index.html');
         
     $config->types('news');
