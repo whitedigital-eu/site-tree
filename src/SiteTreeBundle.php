@@ -122,17 +122,17 @@ class SiteTreeBundle extends AbstractBundle
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $siteTree = array_merge_recursive(...$builder->getExtensionConfig('site_tree') ?? []);
-        $audit = array_merge_recursive(...$builder->getExtensionConfig('whitedigital') ?? [])['audit'] ?? [];
+        $siteTree = array_merge_recursive(...$builder->getExtensionConfig('site_tree'));
+        $audit = array_merge_recursive(...$builder->getExtensionConfig('audit'));
 
         $manager = $siteTree['entity_manager'] ?? 'default';
-        $mappings = $this->getOrmMappings($builder, $manager);
 
-        $this->addDoctrineConfig($container, $manager, $mappings, 'SiteTree', self::MAPPINGS);
+        $this->addDoctrineConfig($container, $manager, 'SiteTree', self::MAPPINGS);
         $this->addApiPlatformPaths($container, self::PATHS);
 
-        if (true === ($audit['enabled'] ?? false)) {
-            $this->addDoctrineConfig($container, $audit['audit_entity_manager'], $mappings, 'SiteTree', self::MAPPINGS);
+        if ([] !== $audit) {
+            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager']);
+            $this->addDoctrineConfig($container, $audit['audit_entity_manager'], 'SiteTree', self::MAPPINGS, $mappings);
         }
 
         $container->extension('stof_doctrine_extensions', [

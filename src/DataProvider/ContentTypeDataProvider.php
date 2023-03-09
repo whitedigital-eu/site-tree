@@ -71,7 +71,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         }
 
         if ([] === $entities) {
-            throw new NotFoundHttpException($this->translator->trans('named_resource_not_found', ['%resource%' => '', '%id%' => $uriVariables['id']], domain: 'SiteTree'));
+            throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
         }
 
         $resource->nodeId = $found->getId();
