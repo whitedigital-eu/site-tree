@@ -85,7 +85,12 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
             throw new BadRequestHttpException($this->translator->trans('empty_slug_above_zero', domain: 'SiteTree'));
         }
 
-        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy(['level' => $level, 'slug' => $slug])) {
+        $select = ['level' => $level, 'slug' => $slug];
+        if(0 < $level){
+            $select = ['slug' => $slug, 'parent' => $entity->getParent()];
+        }
+
+        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy($select)) {
             throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $slug], domain: 'SiteTree'));
         }
 
