@@ -9,12 +9,12 @@ trait Active
     #[ORM\Column(nullable: false)]
     protected ?bool $isActive = null;
 
-    public function getIsActive(): bool
+    public function getIsActive(): ?bool
     {
         return $this->isActive;
     }
 
-    public function setIsActive(bool $isActive): static
+    public function setIsActive(?bool $isActive): static
     {
         $this->isActive = $isActive;
 

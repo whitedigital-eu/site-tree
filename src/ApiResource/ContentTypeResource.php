@@ -4,19 +4,25 @@ namespace WhiteDigital\SiteTree\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\OpenApi\Model;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
 
 #[
     ApiResource(
-        shortName: 'ContentType',
+        shortName: 'SiteTree',
         operations: [
             new Get(
                 uriTemplate: '/content_types/{id}',
                 requirements: ['id' => '.+', ],
+                openapi: new Model\Operation(
+                    summary: 'Check if given slug (id) is a valid site tree slug',
+                    description: 'Check if given slug (id) is a valid site tree slug',
+                ),
             ),
         ],
-        routePrefix: '/wd/st',
+        paginationClientEnabled: false,
+        paginationEnabled: false,
         provider: ContentTypeDataProvider::class,
     )
 ]

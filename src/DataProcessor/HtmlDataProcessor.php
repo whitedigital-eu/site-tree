@@ -5,13 +5,13 @@ namespace WhiteDigital\SiteTree\DataProcessor;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\ApiResource\Php82\AbstractDataProcessor;
+use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 use WhiteDigital\SiteTree\Entity\Html;
 
-final readonly class HtmlDataProcessor extends AbstractDataProcessor
+final class HtmlDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {

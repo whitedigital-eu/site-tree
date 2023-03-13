@@ -8,12 +8,12 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\ApiResource\Php82\AbstractDataProvider;
+use WhiteDigital\EntityResourceMapper\DataProvider\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 
-final readonly class SiteTreeDataProvider extends AbstractDataProvider
+final class SiteTreeDataProvider extends AbstractDataProvider
 {
     /**
      * @throws ReflectionException
