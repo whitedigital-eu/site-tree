@@ -22,7 +22,7 @@ class AllowedTypeValidator extends ConstraintValidator
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!in_array($value, $types = array_keys($this->bag->get('whitedigital.site_tree.types')), true)) {
-            $this->context->buildViolation($this->translator->trans('invalid_parameter_list_allowed', ['parameter' => $value, 'allowed' => implode(', ', $types)], domain: 'SiteTree'))->addViolation();
+            $this->context->buildViolation($this->translator->trans('invalid_parameter_list_allowed', ['%parameter%' => $value, '%allowed%' => implode(', ', $types)], domain: 'SiteTree'))->addViolation();
         }
     }
 }

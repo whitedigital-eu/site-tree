@@ -9,8 +9,10 @@ use ApiPlatform\Metadata\Patch;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\ApiResource\Php82\AbstractDataProcessor;
+use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
@@ -22,9 +24,10 @@ use function end;
 use function explode;
 use function in_array;
 use function preg_match;
+use function rtrim;
 use function str_replace;
 
-final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
+final class SiteTreeDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {
@@ -73,6 +76,22 @@ final readonly class SiteTreeDataProcessor extends AbstractDataProcessor
             /* @var SiteTreeRepository $repo */
             $entity->setRoot($repo->getRootById($existingEntity->getId()));
             $entity->setParent($repo->getParentById($existingEntity->getId()));
+        }
+
+        $level = null === $entity->getParent() ? 0 : $entity->getParent()->getLevel() + 1;
+        $slug = $entity->getSlug();
+
+        if (0 < $level && '' === rtrim($slug, '/')) {
+            throw new BadRequestHttpException($this->translator->trans('empty_slug_above_zero', domain: 'SiteTree'));
+        }
+
+        $select = ['level' => $level, 'slug' => $slug];
+        if (0 < $level) {
+            $select = ['slug' => $slug, 'parent' => $entity->getParent()];
+        }
+
+        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy($select)) {
+            throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $slug], domain: 'SiteTree'));
         }
 
         return $entity;

@@ -14,7 +14,6 @@ use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
 #[ORM\Entity(repositoryClass: SiteTreeRepository::class)]
-#[ORM\UniqueConstraint(fields: ['level', 'slug', ])]
 #[Gedmo\Tree(type: 'nested')]
 #[Mapping(SiteTreeResource::class)]
 class SiteTree extends BaseEntity
@@ -36,15 +35,15 @@ class SiteTree extends BaseEntity
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(name: 'lvl', nullable: false)]
-    protected int $level;
+    protected ?int $level = null;
 
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', nullable: false)]
-    protected int $left;
+    protected ?int $left = null;
 
     #[Gedmo\TreeRight]
     #[ORM\Column(name: 'rgt', nullable: false)]
-    protected int $right;
+    protected ?int $right = null;
 
     #[Gedmo\TreeRoot]
     #[ORM\ManyToOne(targetEntity: self::class)]
@@ -179,36 +178,36 @@ class SiteTree extends BaseEntity
         return $this;
     }
 
-    public function getLevel(): int
+    public function getLevel(): ?int
     {
         return $this->level;
     }
 
-    public function setLevel(int $level): self
+    public function setLevel(?int $level): self
     {
         $this->level = $level;
 
         return $this;
     }
 
-    public function getLeft(): int
+    public function getLeft(): ?int
     {
         return $this->left;
     }
 
-    public function setLeft(int $left): self
+    public function setLeft(?int $left): self
     {
         $this->left = $left;
 
         return $this;
     }
 
-    public function getRight(): int
+    public function getRight(): ?int
     {
         return $this->right;
     }
 
-    public function setRight(int $right): self
+    public function setRight(?int $right): self
     {
         $this->right = $right;
 

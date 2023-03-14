@@ -14,8 +14,10 @@ use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceOrderFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\HtmlDataProcessor;
@@ -41,7 +43,6 @@ use WhiteDigital\SiteTree\Entity\Html;
                 denormalizationContext: ['groups' => [self::READ, ], ],
             ),
         ],
-        routePrefix: '/wd/st',
         normalizationContext: ['groups' => [self::READ, self::ITEM, ], ],
         denormalizationContext: ['groups' => [self::WRITE, ], ],
         order: ['id' => Criteria::ASC, ],
@@ -49,13 +50,16 @@ use WhiteDigital\SiteTree\Entity\Html;
         processor: HtmlDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceSearchFilter::class, properties: ['node.id', ]),
+    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', ]),
+    ApiFilter(ResourceNumericFilter::class, properties: ['node.id', ]),
+    ApiFilter(ResourceOrderFilter::class, properties: ['node.id', 'id', ]),
+    ApiFilter(ResourceSearchFilter::class, properties: ['content', ]),
 ]
 #[Mapping(Html::class)]
 class HtmlResource extends BaseResource
 {
-    use ARTraits\CreatedUpdated;
-    use ARTraits\Groups;
+    use Traits\CreatedUpdated;
+    use Traits\Groups;
     use Traits\SiteTreeNode;
 
     public const PREFIX = 'html:';

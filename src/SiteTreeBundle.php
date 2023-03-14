@@ -6,19 +6,26 @@ use ReflectionClass;
 use ReflectionClassConstant;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
-use WhiteDigital\ApiResource\DependencyInjections\Traits\DefineApiPlatformMappings;
-use WhiteDigital\ApiResource\DependencyInjections\Traits\DefineOrmMappings;
-use WhiteDigital\ApiResource\Functions;
+use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineApiPlatformMappings;
+use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineOrmMappings;
+use WhiteDigital\EntityResourceMapper\EntityResourceMapperBundle;
+use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\Html;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
 use function array_filter;
 use function array_merge_recursive;
+use function class_exists;
+use function is_subclass_of;
+use function sprintf;
+use function str_contains;
 use function str_starts_with;
+use function strtr;
 use function ucfirst;
 
 use const ARRAY_FILTER_USE_KEY;
@@ -47,7 +54,6 @@ class SiteTreeBundle extends AbstractBundle
             ->rootNode();
 
         $root
-            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
             ->arrayNode('types')
@@ -61,7 +67,13 @@ class SiteTreeBundle extends AbstractBundle
             ->scalarNode('entity_prefix')->defaultValue('App\\Entity')->end()
             ->scalarNode('entity_manager')->defaultValue('default')->end()
             ->booleanNode('enable_resources')->defaultTrue()->end()
-            ->scalarNode('index_template')->isRequired()->end();
+            ->scalarNode('index_template')->defaultNull()->end()
+            ->arrayNode('excluded_path_prefixes')
+                ->scalarPrototype()->end()
+            ->end()
+            ->arrayNode('excluded_path_prefixes_dev')
+                ->scalarPrototype()->end()
+            ->end();
 
         $this->addMethodsNode($root);
 
@@ -71,65 +83,100 @@ class SiteTreeBundle extends AbstractBundle
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        if (true === ($config['enabled'] ?? false)) {
-            foreach ((new Functions())->makeOneDimension(['whitedigital.site_tree' => $config]) as $key => $value) {
-                $builder->setParameter($key, $value);
-            }
-
-            $types = [
-                'html' => [
-                    'entity' => Html::class,
-                ],
-                'redirect' => [
-                    'entity' => Redirect::class,
-                ],
-            ];
-
-            foreach ($config['types'] as $type => $value) {
-                $types[$type] = [
-                    'entity' => $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type),
-                ];
-            }
-            $builder->setParameter('whitedigital.site_tree.types', $types);
-
-            $allowed = [];
-            foreach ($config['allowed_methods'] as $method => $enabled) {
-                if (true === $enabled) {
-                    $allowed[] = $method;
-                }
-            }
-            $builder->setParameter('whitedigital.site_tree.allowed_methods', $allowed);
-
-            $container->import('../config/services.php');
+        foreach (EntityResourceMapperBundle::makeOneDimension(['whitedigital.site_tree' => $config]) as $key => $value) {
+            $builder->setParameter($key, $value);
         }
 
-        $container->import('../config/decorator.php');
+        if (null === $builder->getParameter('whitedigital.site_tree.index_template')) {
+            throw new InvalidConfigurationException('"index_template" parameter must be set');
+        }
+
+        $types = [
+            'html' => [
+                'entity' => Html::class,
+            ],
+            'redirect' => [
+                'entity' => Redirect::class,
+            ],
+        ];
+
+        foreach ($config['types'] as $type => $value) {
+            $entity = $value['entity'] ?? $config['entity_prefix'] . '\\' . ucfirst($type);
+            if (!class_exists($entity)) {
+                throw new InvalidConfigurationException(sprintf('Can\'t use type %s if entity %s does not exists', $type, $entity));
+            }
+
+            if (!is_subclass_of($entity, AbstractNodeEntity::class)) {
+                throw new InvalidConfigurationException(sprintf('Type entities must extend %s, wrong parent on %s', AbstractNodeEntity::class, $entity));
+            }
+
+            $types[$type] = [
+                'entity' => $entity,
+            ];
+        }
+
+        $builder->setParameter('whitedigital.site_tree.types', $types);
+
+        $allowed = [];
+        foreach ($config['allowed_methods'] as $method => $enabled) {
+            if (true === $enabled) {
+                $allowed[] = $method;
+            }
+        }
+        $builder->setParameter('whitedigital.site_tree.allowed_methods', $allowed);
+
+        $container->import('../config/services.php');
     }
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $siteTree = array_merge_recursive(...$builder->getExtensionConfig('site_tree') ?? []);
-        $audit = array_merge_recursive(...$builder->getExtensionConfig('whitedigital') ?? [])['audit'] ?? [];
+        $audit = self::getConfig('audit', $builder);
 
-        if (true === ($siteTree['enabled'] ?? true)) {
-            $manager = $siteTree['entity_manager'] ?? 'default';
-            $mappings = $this->getOrmMappings($builder, $manager);
+        $manager = self::getConfig('site_tree', $builder)['entity_manager'] ?? 'default';
 
-            $this->addDoctrineConfig($container, $manager, $mappings, 'SiteTree', self::MAPPINGS);
-            $this->addApiPlatformPaths($container, self::PATHS);
+        $this->addDoctrineConfig($container, $manager, 'SiteTree', self::MAPPINGS);
+        $this->addApiPlatformPaths($container, self::PATHS);
 
-            if (true === ($audit['enabled'] ?? false)) {
-                $this->addDoctrineConfig($container, $audit['audit_entity_manager'], $mappings, 'SiteTree', self::MAPPINGS);
-            }
-
-            $container->extension('stof_doctrine_extensions', [
-                'orm' => [
-                    $manager => [
-                        'tree' => true,
-                    ],
-                ],
-            ]);
+        if ([] !== $audit) {
+            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager']);
+            $this->addDoctrineConfig($container, $audit['audit_entity_manager'], 'SiteTree', self::MAPPINGS, $mappings);
         }
+
+        $stof = [
+            'orm' => [
+                $manager => [
+                    'tree' => true,
+                ],
+            ],
+        ];
+
+        if (null !== ($locale = self::getLocale($builder))) {
+            $stof['default_locale'] = $locale;
+        }
+
+        $container->extension('stof_doctrine_extensions', $stof);
+    }
+
+    public static function getLocale(ContainerBuilder $builder): ?string
+    {
+        $framework = self::getConfig('framework', $builder);
+        $locale = $framework['default_locale'];
+        if (str_contains($locale, '%') && !str_contains($locale, '%env')) {
+            if ($builder->hasParameter($key = strtr($locale, ['%' => '']))) {
+                $locale = $builder->getParameter($key);
+            }
+        }
+
+        if (str_contains($locale, '%env')) {
+            $locale = $_ENV[strtr($locale, ['%env(' => '', ')%' => ''])] ?? null;
+        }
+
+        return $locale;
+    }
+
+    public static function getConfig(string $package, ContainerBuilder $builder): array
+    {
+        return array_merge_recursive(...$builder->getExtensionConfig($package));
     }
 
     private function filterKeyStartsWith(array $input, string $startsWith): array

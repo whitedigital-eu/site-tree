@@ -16,11 +16,12 @@ use ArrayObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use WhiteDigital\ApiResource\ApiResource\Traits as ARTraits;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
-use WhiteDigital\EntityResourceMapper\Filters\ResourceDateFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceEnumFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\SiteTreeDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\SiteTreeDataProvider;
@@ -107,21 +108,21 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
         ],
-        routePrefix: '/wd/st',
         normalizationContext: ['groups' => [self::ITEM, self::READ, ], ],
         denormalizationContext: ['groups' => [self::WRITE, ], ],
         provider: SiteTreeDataProvider::class,
         processor: SiteTreeDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceDateFilter::class, properties: ['createdAt', 'updatedAt', ]),
-    ApiFilter(ResourceNumericFilter::class, properties: ['level']),
+    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', ]),
+    ApiFilter(ResourceNumericFilter::class, properties: ['level', 'parent.id', ]),
+    ApiFilter(ResourceSearchFilter::class, properties: ['slug', 'slug', 'title', 'type', ]),
 ]
 #[Mapping(SiteTree::class)]
 class SiteTreeResource extends BaseResource
 {
-    use ARTraits\CreatedUpdated;
-    use ARTraits\Groups;
+    use Traits\CreatedUpdated;
+    use Traits\Groups;
 
     public const PREFIX = 'site_tree:';
     public const MOVE = self::PREFIX . 'move';
@@ -133,7 +134,7 @@ class SiteTreeResource extends BaseResource
     #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public ?self $root = null;
 
-    #[Groups([self::ITEM, self::READ, ])]
+    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
     public ?int $level = null;
 
     #[Groups([self::ITEM, self::READ, ])]

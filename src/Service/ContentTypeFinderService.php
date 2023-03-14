@@ -1,10 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree;
+namespace WhiteDigital\SiteTree\Service;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -13,21 +12,24 @@ use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
-use function array_key_last;
+use function explode;
 use function implode;
+use function in_array;
 use function is_numeric;
 use function ltrim;
 use function rtrim;
 use function substr_count;
 
-final readonly class Functions
+final readonly class ContentTypeFinderService
 {
+    private SiteTreeRepository $repository;
+
     public function __construct(
         private EntityManagerInterface $em,
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
-        private null|SiteTreeRepository|EntityRepository $repository = null,
     ) {
+        $this->repository = $this->em->getRepository(SiteTree::class);
     }
 
     /**
@@ -53,13 +55,13 @@ final readonly class Functions
 
         $found = null;
         foreach ($this->repository->findAllActiveByLevel($count) as $item) {
-            if ($this->repository->getSlug($item) === $slug) {
+            if (in_array($this->repository->getSlug($item), [$slug, '/' . $slug], true)) {
                 $found = $item;
             }
         }
 
         if (null === $found) {
-            throw new NotFoundHttpException($this->translator->trans(Response::$statusTexts[Response::HTTP_NOT_FOUND], domain: 'SiteTree'));
+            throw new NotFoundHttpException($this->translator->trans('named_resource_not_found', ['%resource%' => '', '%id%' => $slug], domain: 'SiteTree'));
         }
 
         if (null !== $end) {
