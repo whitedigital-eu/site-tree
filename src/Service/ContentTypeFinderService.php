@@ -1,10 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree;
+namespace WhiteDigital\SiteTree\Service;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -13,7 +12,7 @@ use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
-use function array_key_last;
+use function explode;
 use function implode;
 use function in_array;
 use function is_numeric;
@@ -21,14 +20,16 @@ use function ltrim;
 use function rtrim;
 use function substr_count;
 
-final readonly class Functions
+final readonly class ContentTypeFinderService
 {
+    private SiteTreeRepository $repository;
+
     public function __construct(
         private EntityManagerInterface $em,
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
-        private null|SiteTreeRepository|EntityRepository $repository = null,
     ) {
+        $this->repository = $this->em->getRepository(SiteTree::class);
     }
 
     /**

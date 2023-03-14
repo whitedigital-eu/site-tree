@@ -20,22 +20,20 @@ use WhiteDigital\EntityResourceMapper\Security\Enum\GrantType;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
-use WhiteDigital\SiteTree\Functions;
+use WhiteDigital\SiteTree\Service\ContentTypeFinderService;
 
 use function array_key_exists;
 use function array_merge;
 
 final readonly class ContentTypeDataProvider implements ProviderInterface
 {
-    private Functions $functions;
-
     public function __construct(
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
         private EntityManagerInterface $em,
         private AuthorizationService $authorizationService,
+        private ContentTypeFinderService $finder,
     ) {
-        $this->functions = new Functions($this->em, $this->bag, $this->translator, $this->em->getRepository(SiteTree::class));
     }
 
     /**
@@ -46,7 +44,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $found = $this->functions->findContentType($uriVariables['id']);
+        $found = $this->finder->findContentType($uriVariables['id']);
 
         $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::ITEM_GET, $operation->getClass()));
         $this->authorizationService->authorizeSingleObject($found, AuthorizationService::ITEM_GET);

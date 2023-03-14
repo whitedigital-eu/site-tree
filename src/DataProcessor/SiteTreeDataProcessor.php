@@ -86,7 +86,7 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
         }
 
         $select = ['level' => $level, 'slug' => $slug];
-        if(0 < $level){
+        if (0 < $level) {
             $select = ['slug' => $slug, 'parent' => $entity->getParent()];
         }
 

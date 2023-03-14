@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceEnumFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
@@ -113,9 +114,9 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
         processor: SiteTreeDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceNumericFilter::class, properties: ['level']),
-    ApiFilter(ResourceSearchFilter::class, properties: ['slug']),
-    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive'])
+    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', ]),
+    ApiFilter(ResourceNumericFilter::class, properties: ['level', 'parent.id', ]),
+    ApiFilter(ResourceSearchFilter::class, properties: ['slug', 'slug', 'title', 'type', ]),
 ]
 #[Mapping(SiteTree::class)]
 class SiteTreeResource extends BaseResource

@@ -24,7 +24,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WhiteDigital\SiteTree\Entity\Redirect;
 use WhiteDigital\SiteTree\Entity\SiteTree;
-use WhiteDigital\SiteTree\Functions;
+use WhiteDigital\SiteTree\Service\ContentTypeFinderService;
 
 use function array_merge;
 use function filter_var;
@@ -40,12 +40,12 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
     private const EXCLUDES = [
         '/api',
     ];
+
     private const DEV_EXCLUDES = [
         '/_wdt',
         '/_error',
         '/_profiler',
     ];
-    private Functions $functions;
 
     public function __construct(
         private Environment $twig,
@@ -53,8 +53,8 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private UrlMatcherInterface $matcher,
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
+        private ContentTypeFinderService $finder,
     ) {
-        $this->functions = new Functions($this->em, $this->bag, $this->translator, $this->em->getRepository(SiteTree::class));
     }
 
     public static function getSubscribedEvents(): array
@@ -78,9 +78,9 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         $request = $requestEvent->getRequest();
 
-        $excludes = self::EXCLUDES;
+        $excludes = array_merge(self::EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes'));
         if ('dev' === $this->bag->get('kernel.environment')) {
-            $excludes = array_merge(self::EXCLUDES, self::DEV_EXCLUDES);
+            $excludes = array_merge(self::EXCLUDES, self::DEV_EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes_dev'));
         }
 
         foreach ($excludes as $exclude) {
@@ -107,7 +107,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         $found = null;
 
         try {
-            $found = $this->functions->findContentType($requestEvent->getRequest()->getPathInfo());
+            $found = $this->finder->findContentType($requestEvent->getRequest()->getPathInfo());
         } catch (NotFoundHttpException) {
             $response = new Response(status: Response::HTTP_NOT_FOUND);
         }

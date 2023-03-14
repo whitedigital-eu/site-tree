@@ -16,6 +16,9 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceOrderFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\RedirectDataProcessor;
@@ -48,7 +51,10 @@ use WhiteDigital\SiteTree\Entity\Redirect;
         processor: RedirectDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceSearchFilter::class, properties: ['node.id', ]),
+    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', ]),
+    ApiFilter(ResourceNumericFilter::class, properties: ['node.id', 'code', ]),
+    ApiFilter(ResourceOrderFilter::class, properties: ['node.id', 'id', 'code', ]),
+    ApiFilter(ResourceSearchFilter::class, properties: ['content', ]),
 ]
 #[Mapping(Redirect::class)]
 class RedirectResource extends BaseResource

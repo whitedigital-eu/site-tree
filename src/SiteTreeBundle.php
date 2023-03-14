@@ -23,7 +23,9 @@ use function array_merge_recursive;
 use function class_exists;
 use function is_subclass_of;
 use function sprintf;
+use function str_contains;
 use function str_starts_with;
+use function strtr;
 use function ucfirst;
 
 use const ARRAY_FILTER_USE_KEY;
@@ -65,7 +67,13 @@ class SiteTreeBundle extends AbstractBundle
             ->scalarNode('entity_prefix')->defaultValue('App\\Entity')->end()
             ->scalarNode('entity_manager')->defaultValue('default')->end()
             ->booleanNode('enable_resources')->defaultTrue()->end()
-            ->scalarNode('index_template')->defaultNull()->end();
+            ->scalarNode('index_template')->defaultNull()->end()
+            ->arrayNode('excluded_path_prefixes')
+                ->scalarPrototype()->end()
+            ->end()
+            ->arrayNode('excluded_path_prefixes_dev')
+                ->scalarPrototype()->end()
+            ->end();
 
         $this->addMethodsNode($root);
 
@@ -122,10 +130,9 @@ class SiteTreeBundle extends AbstractBundle
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $siteTree = array_merge_recursive(...$builder->getExtensionConfig('site_tree'));
-        $audit = array_merge_recursive(...$builder->getExtensionConfig('audit'));
+        $audit = self::getConfig('audit', $builder);
 
-        $manager = $siteTree['entity_manager'] ?? 'default';
+        $manager = self::getConfig('site_tree', $builder)['entity_manager'] ?? 'default';
 
         $this->addDoctrineConfig($container, $manager, 'SiteTree', self::MAPPINGS);
         $this->addApiPlatformPaths($container, self::PATHS);
@@ -135,13 +142,41 @@ class SiteTreeBundle extends AbstractBundle
             $this->addDoctrineConfig($container, $audit['audit_entity_manager'], 'SiteTree', self::MAPPINGS, $mappings);
         }
 
-        $container->extension('stof_doctrine_extensions', [
+        $stof = [
             'orm' => [
                 $manager => [
                     'tree' => true,
                 ],
             ],
-        ]);
+        ];
+
+        if (null !== ($locale = self::getLocale($builder))) {
+            $stof['default_locale'] = $locale;
+        }
+
+        $container->extension('stof_doctrine_extensions', $stof);
+    }
+
+    public static function getLocale(ContainerBuilder $builder): ?string
+    {
+        $framework = self::getConfig('framework', $builder);
+        $locale = $framework['default_locale'];
+        if (str_contains($locale, '%') && !str_contains($locale, '%env')) {
+            if ($builder->hasParameter($key = strtr($locale, ['%' => '']))) {
+                $locale = $builder->getParameter($key);
+            }
+        }
+
+        if (str_contains($locale, '%env')) {
+            $locale = $_ENV[strtr($locale, ['%env(' => '', ')%' => ''])] ?? null;
+        }
+
+        return $locale;
+    }
+
+    public static function getConfig(string $package, ContainerBuilder $builder): array
+    {
+        return array_merge_recursive(...$builder->getExtensionConfig($package));
     }
 
     private function filterKeyStartsWith(array $input, string $startsWith): array
