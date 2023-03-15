@@ -117,3 +117,39 @@ but GET `/api/content_types/test2` would return:
     "detail": "Not Found"
 }
 ```
+
+### Extra configuration parameters
+As this library does use route listener to override router when any url is called to include
+index template file, you might need to filter out some paths where this should not be done.  
+To configure these paths, you can do:
+```yaml
+site_tree:
+    index_template: index.html
+    excluded_path_prefixes:
+        - '/admin'
+    excluded_path_prefixes_dev:
+        - '/test'
+```
+```php
+use Symfony\Config\SiteTreeConfig;
+
+return static function (SiteTreeConfig $config): void {
+    $config
+        ->indexTemplate('index.html')
+        ->excludedPathPrefixes([
+            '/admin',
+        ])
+        ->excludedPathPrefixesDev([
+            '/test',
+        ]);
+};
+```
+This configuration skips listener logic for any path that starts with these definded paths.  
+By default this bundle alrady skip some paths:  
+In any environment:  
+- `/api`
+
+In dev/test environment:  
+- `/_profiler`  
+- `/_wdt`  
+- `/_error`  

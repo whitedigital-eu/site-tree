@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
-use WhiteDigital\EntityResourceMapper\Filters\ResourceEnumFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
