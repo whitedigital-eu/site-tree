@@ -137,8 +137,8 @@ class SiteTreeBundle extends AbstractBundle
         $this->addApiPlatformPaths($container, self::PATHS);
 
         if ([] !== $audit) {
-            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager']);
-            $this->addDoctrineConfig($container, $audit['audit_entity_manager'], 'SiteTree', self::MAPPINGS, $mappings);
+            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager'] ?? 'default');
+            $this->addDoctrineConfig($container, $audit['audit_entity_manager'] ?? 'audit', 'SiteTree', self::MAPPINGS, $mappings);
         }
 
         $stof = [
