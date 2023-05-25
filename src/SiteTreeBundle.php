@@ -72,7 +72,8 @@ class SiteTreeBundle extends AbstractBundle
             ->end()
             ->arrayNode('excluded_path_prefixes_dev')
                 ->scalarPrototype()->end()
-            ->end();
+            ->end()
+            ->booleanNode('skip_for_no_security')->defaultTrue()->end();
 
         $this->addMethodsNode($root);
 

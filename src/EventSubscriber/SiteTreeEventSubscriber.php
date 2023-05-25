@@ -5,6 +5,7 @@ namespace WhiteDigital\SiteTree\EventSubscriber;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -54,6 +55,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
         private ContentTypeFinderService $finder,
+        private Security $security,
     ) {
     }
 
@@ -87,6 +89,10 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             if (str_starts_with($request->getPathInfo(), $exclude)) {
                 return;
             }
+        }
+
+        if (true === $this->bag->get('whitedigital.site_tree.skip_for_no_security') && null === $this->security->getFirewallConfig($request)) {
+            return;
         }
 
         try {

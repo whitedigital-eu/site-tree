@@ -153,3 +153,21 @@ In dev/test environment:
 - `/_profiler`  
 - `/_wdt`  
 - `/_error`  
+
+### Skip site tree subscriber for no security firewall
+If you want to skip subscriber check for existing route for images or other no security 
+routes, you can enable `skip_for_no_security` parameter. By default, this is enabled.  
+```yaml
+site_tree:
+    index_template: index.html
+    skip_for_no_security: false
+```
+```php
+use Symfony\Config\SiteTreeConfig;
+
+return static function (SiteTreeConfig $config): void {
+    $config
+        ->indexTemplate('index.html')
+        ->skipForNoSecurity(false);
+};
+```
