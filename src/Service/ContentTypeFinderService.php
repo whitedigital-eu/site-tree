@@ -15,7 +15,6 @@ use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 use function explode;
 use function implode;
 use function in_array;
-use function is_numeric;
 use function ltrim;
 use function rtrim;
 use function substr_count;
@@ -37,16 +36,9 @@ final readonly class ContentTypeFinderService
      */
     public function findContentType(string $path): SiteTree|AbstractNodeEntity
     {
-        /** @var SiteTreeRepository $repo */
         $slug = ltrim(rtrim($path, '/'), '/');
         $parts = explode('/', $slug);
         $end = $parts[$key = array_key_last($parts)];
-        if (is_numeric($end)) {
-            unset($parts[$key]);
-            $slug = implode('/', $parts);
-        } else {
-            $end = null;
-        }
         $count = substr_count($slug, '/');
 
         if ('' === $slug) {
@@ -61,15 +53,25 @@ final readonly class ContentTypeFinderService
         }
 
         if (null === $found) {
-            throw new NotFoundHttpException($this->translator->trans('named_resource_not_found', ['%resource%' => '', '%id%' => $slug], domain: 'SiteTree'));
-        }
+            unset($parts[$key]);
+            $slug = implode('/', $parts);
+            $count--;
 
-        if (null !== $end) {
+            foreach ($this->repository->findAllActiveByLevel($count) as $item) {
+                if (in_array($this->repository->getSlug($item), [$slug, '/' . $slug], true)) {
+                    $found = $item;
+                }
+            }
+
+            if (null === $found) {
+                throw new NotFoundHttpException($this->translator->trans('named_resource_not_found', ['%resource%' => '', '%id%' => $slug], domain: 'SiteTree'));
+            }
+
             $types = $this->bag->get('whitedigital.site_tree.types');
             $entity = $types[$found->getType()]['entity'] ?? null;
 
             if (null !== $entity) {
-                $item = $this->em->getRepository($entity)->find($end);
+                $item = $this->em->getRepository($entity)->findOneBySlug($end);
 
                 if (null !== $item) {
                     return $item;

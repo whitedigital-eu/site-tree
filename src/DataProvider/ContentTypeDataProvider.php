@@ -51,6 +51,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
 
         $entities = [[]];
         $resource = new ContentTypeResource();
+
         if (!$found instanceof SiteTree) {
             $resource->resource = $found;
             $found = $found->getNode();
@@ -61,15 +62,15 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
                     $entities[] = $items;
                 }
             }
-        }
 
-        $entities = array_merge(...$entities);
-        if ([] !== $entities) {
-            $resource->resources = $entities;
-        }
+            $entities = array_merge(...$entities);
+            if ([] !== $entities) {
+                $resource->resources = $entities;
+            }
 
-        if ([] === $entities) {
-            throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
+            if ([] === $entities) {
+                throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
+            }
         }
 
         $resource->nodeId = $found->getId();

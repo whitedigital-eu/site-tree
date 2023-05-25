@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 
 use function array_keys;
-use function array_reverse;
 
 class SiteTreeFixture extends Fixture
 {
@@ -24,7 +23,7 @@ class SiteTreeFixture extends Fixture
         $factory = Factory::create($this->bag->get('stof_doctrine_extensions.default_locale'));
         $factory->seed('whitedigital');
 
-        $types = array_reverse(array_keys($this->bag->get('whitedigital.site_tree.types')));
+        $types = array_keys($this->bag->get('whitedigital.site_tree.types'));
 
         for ($i = 0; $i < 3; $i++) {
             $parent = $root = null;

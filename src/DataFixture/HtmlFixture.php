@@ -34,7 +34,8 @@ class HtmlFixture extends Fixture implements DependentFixtureInterface
             $fixture = (new Html())
                 ->setIsActive(true)
                 ->setContent($factory->randomHtml())
-                ->setNode($this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html'])));
+                ->setNode($this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html'])))
+                ->setSlug($factory->words(1, true));
 
             $manager->persist($fixture);
         }

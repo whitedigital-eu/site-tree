@@ -17,6 +17,9 @@ abstract class AbstractNodeEntity extends BaseEntity
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     protected ?SiteTree $node = null;
 
+    #[ORM\Column(nullable: true)]
+    protected ?string $slug = null;
+
     public function getNode(): ?SiteTree
     {
         return $this->node;
@@ -25,6 +28,18 @@ abstract class AbstractNodeEntity extends BaseEntity
     public function setNode(?SiteTree $node): static
     {
         $this->node = $node;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

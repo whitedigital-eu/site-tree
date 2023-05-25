@@ -13,4 +13,8 @@ trait SiteTreeNode
     #[Assert\NotBlank]
     #[ApiProperty(openapiContext: ['example' => '/api/site_trees/1', ])]
     public ?SiteTreeResource $node = null;
+
+    #[Groups([self::READ, self::ITEM, self::PATCH, self::WRITE, ])]
+    #[Assert\NotBlank]
+    public ?string $slug = null;
 }
