@@ -90,7 +90,17 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
             $select = ['slug' => $slug, 'parent' => $entity->getParent()];
         }
 
-        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy($select)) {
+        $res = $this->entityManager->getRepository($this->getEntityClass())->findBy($select);
+        if (in_array($entity, $res, true)) {
+            foreach ($res as $key => $item) {
+                if ($item === $entity) {
+                    unset($res[$key]);
+                    break;
+                }
+            }
+        }
+
+        if ([] !== $res) {
             throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $slug], domain: 'SiteTree'));
         }
 
