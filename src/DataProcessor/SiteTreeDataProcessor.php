@@ -15,19 +15,15 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
-use function end;
-use function explode;
 use function in_array;
 use function preg_match;
 use function rtrim;
-use function str_replace;
 
-final class SiteTreeDataProcessor extends AbstractDataProcessor
+class SiteTreeDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {
@@ -44,15 +40,12 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
     {
         if (!$operation instanceof DeleteOperationInterface) {
             if ($operation instanceof Patch) {
-                if (null === ($entity = $this->move($operation, $data, $context))) {
-                    $entity = $this->patch($data, $operation, $context);
-                }
+                $entity = $this->patch($data, $operation, $context);
             } else {
                 $entity = $this->post($data, $operation, $context);
             }
 
             $this->flushAndRefresh($entity);
-            /* @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->entityManager->getRepository($this->getEntityClass())->recover();
             $this->flushAndRefresh($entity);
 
@@ -119,7 +112,6 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
 
     protected function removeWithFkCheck(BaseEntity $entity): void
     {
-        /* @noinspection PhpPossiblePolymorphicInvocationInspection */
         $this->entityManager->getRepository($this->getEntityClass())->removeFromTree($entity);
 
         try {
@@ -130,45 +122,5 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
         }
 
         $this->entityManager->clear();
-    }
-
-    /**
-     * @throws Exception
-     *
-     * @noinspection PhpPossiblePolymorphicInvocationInspection
-     */
-    private function moveNode(mixed $data, string $position, array $context = [], ?int $places = null): ?BaseEntity
-    {
-        $this->authorizationService->authorizeSingleObject($data, AuthorizationService::ITEM_PATCH);
-        $existingEntity = $this->findById($this->getEntityClass(), $data->id);
-
-        $entity = $this->createEntity($data, $context, $existingEntity);
-
-        match ($position) {
-            'up', 'top' => $this->entityManager->getRepository($this->getEntityClass())->moveUp($entity, $places ?? true),
-            'down', 'bottom' => $this->entityManager->getRepository($this->getEntityClass())->moveDown($entity, $places ?? true),
-            default => null,
-        };
-
-        return $entity;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function move(Operation $operation, mixed $data, array $context = []): ?BaseEntity
-    {
-        if (in_array(SiteTreeResource::MOVE, $operation->getDenormalizationContext()['groups'] ?? [], true)) {
-            $parts = explode('/', $operation->getName());
-            $position = str_replace('_patch', '', end($parts));
-
-            return match ($position) {
-                'up', 'down' => $this->moveNode($data, $position, $context, 1),
-                'top', 'bottom' => $this->moveNode($data, $position, $context),
-                default => null,
-            };
-        }
-
-        return null;
     }
 }

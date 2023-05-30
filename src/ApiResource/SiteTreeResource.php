@@ -24,6 +24,7 @@ use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProcessor\SiteTreeDataProcessor;
+use WhiteDigital\SiteTree\DataProcessor\SiteTreeMovementDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\SiteTreeDataProvider;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
@@ -57,6 +58,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                     ),
                 ),
                 denormalizationContext: ['groups' => [self::MOVE, ], ],
+                processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
                 uriTemplate: '/site_trees/{id}/down',
@@ -71,6 +73,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                     ),
                 ),
                 denormalizationContext: ['groups' => [self::MOVE, ], ],
+                processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
                 uriTemplate: '/site_trees/{id}/top',
@@ -85,6 +88,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                     ),
                 ),
                 denormalizationContext: ['groups' => [self::MOVE, ], ],
+                processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
                 uriTemplate: '/site_trees/{id}/bottom',
@@ -99,10 +103,23 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                     ),
                 ),
                 denormalizationContext: ['groups' => [self::MOVE, ], ],
+                processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
+                uriTemplate: '/site_trees/{id}/to/{position}',
                 requirements: ['id' => '\d+', ],
                 status: Response::HTTP_NO_CONTENT,
+                openapi: new Model\Operation(
+                    summary: 'Move node within level to position',
+                    description: 'Move node within level to position',
+                    requestBody: new Model\RequestBody(
+                        content: new ArrayObject(),
+                        required: false,
+                    ),
+                ),
+                denormalizationContext: ['groups' => [self::MOVE, ], ],
+                processor: SiteTreeMovementDataProcessor::class,
+            ),
             new Patch(
                 requirements: ['id' => '\d+', ],
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
