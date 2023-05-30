@@ -19,7 +19,6 @@ use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 class SiteTree extends BaseEntity
 {
     use Id;
-    use Traits\Active;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     #[ORM\OrderBy(['left' => Criteria::ASC])]
@@ -65,9 +64,24 @@ class SiteTree extends BaseEntity
     #[ORM\Column(nullable: true)]
     protected ?string $metaDescription = null;
 
+    #[ORM\Column(nullable: false)]
+    protected ?bool $isActive = null;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
     }
 
     public function getChildren(): Collection

@@ -37,7 +37,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
             ),
             new Get(
                 requirements: ['id' => '\d+', ],
-                normalizationContext: ['groups' => [self::ITEM, ], ],
+                normalizationContext: ['groups' => [self::READ, ], ],
             ),
             new GetCollection(
                 paginationEnabled: false,
@@ -102,13 +102,16 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
             ),
             new Patch(
                 requirements: ['id' => '\d+', ],
-                denormalizationContext: ['groups' => [self::PATCH, ], ],
+                status: Response::HTTP_NO_CONTENT,
+            new Patch(
+                requirements: ['id' => '\d+', ],
+                denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
             new Post(
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
         ],
-        normalizationContext: ['groups' => [self::ITEM, self::READ, ], ],
+        normalizationContext: ['groups' => [self::READ, ], ],
         denormalizationContext: ['groups' => [self::WRITE, ], ],
         provider: SiteTreeDataProvider::class,
         processor: SiteTreeDataProcessor::class,
@@ -129,50 +132,50 @@ class SiteTreeResource extends BaseResource
     public const MOVE = self::PREFIX . 'move';
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::ITEM, self::READ, ])]
+    #[Groups([self::READ, ])]
     public mixed $id = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     public ?self $root = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     public ?int $level = null;
 
-    #[Groups([self::ITEM, self::READ, ])]
+    #[Groups([self::READ, ])]
     public ?int $left = null;
 
     public ?int $right = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     public bool $isActive = false;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     public bool $isVisible = true;
 
-    #[Groups([self::PATCH, self::WRITE, ])]
+    #[Groups([self::WRITE, ])]
     public ?self $parent = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     #[Assert\NotBlank]
     public ?string $title = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     #[Assert\NotBlank]
     public ?string $slug = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     public ?string $metaTitle = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     public ?string $metaDescription = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     #[AllowedType]
     #[Assert\NotBlank]
     public ?string $type = null;
 
     /** @var self[]|null */
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     #[SkipCircularReferenceCheck]
     public ?array $children = null;
 }

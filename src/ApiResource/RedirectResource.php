@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
@@ -31,20 +30,20 @@ use WhiteDigital\SiteTree\Entity\Redirect;
         operations: [
             new Get(
                 requirements: ['id' => '\d+', ],
-                normalizationContext: ['groups' => [self::ITEM, ], ],
+                normalizationContext: ['groups' => [self::READ, ], ],
             ),
             new GetCollection(
                 normalizationContext: ['groups' => [self::READ, ], ],
             ),
             new Patch(
                 requirements: ['id' => '\d+', ],
-                denormalizationContext: ['groups' => [self::PATCH, ], ],
+                denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
             new Post(
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
         ],
-        normalizationContext: ['groups' => [self::ITEM, self::READ, ], ],
+        normalizationContext: ['groups' => [self::READ, ], ],
         denormalizationContext: ['groups' => [self::WRITE, ], ],
         order: ['id' => Criteria::ASC, ],
         provider: RedirectDataProvider::class,
@@ -66,20 +65,15 @@ class RedirectResource extends BaseResource
     public const PREFIX = 'redirect:';
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::ITEM, self::READ, ])]
+    #[Groups([self::READ, ])]
     public mixed $id = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
-    #[Assert\Type(type: Type::BUILTIN_TYPE_BOOL)]
-    #[Assert\NotNull]
-    public ?bool $isActive = null;
-
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     #[Assert\NotNull]
     #[Assert\Choice([Response::HTTP_MOVED_PERMANENTLY, Response::HTTP_FOUND, Response::HTTP_TEMPORARY_REDIRECT, Response::HTTP_PERMANENTLY_REDIRECT, ])]
     public ?int $code = null;
 
-    #[Groups([self::ITEM, self::READ, self::PATCH, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, ])]
     #[Assert\NotBlank]
     public ?string $content = null;
 }

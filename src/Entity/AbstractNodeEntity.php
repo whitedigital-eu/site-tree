@@ -5,12 +5,10 @@ namespace WhiteDigital\SiteTree\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Entity\Traits\Id;
-use WhiteDigital\SiteTree\Entity\Traits\Active;
 
 #[ORM\MappedSuperclass]
 abstract class AbstractNodeEntity extends BaseEntity
 {
-    use Active;
     use Id;
 
     #[ORM\ManyToOne(targetEntity: SiteTree::class)]

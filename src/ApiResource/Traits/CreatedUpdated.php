@@ -2,14 +2,14 @@
 
 namespace WhiteDigital\SiteTree\ApiResource\Traits;
 
-use DateTimeImmutable;
 use Symfony\Component\Serializer\Annotation\Groups;
+use WhiteDigital\EntityResourceMapper\UTCDateTimeImmutable;
 
 trait CreatedUpdated
 {
-    #[Groups([self::READ, self::ITEM, ])]
-    public ?DateTimeImmutable $createdAt = null;
+    #[Groups([self::READ, ])]
+    public ?UTCDateTimeImmutable $createdAt = null;
 
-    #[Groups([self::READ, self::ITEM, ])]
-    public ?DateTimeImmutable $updatedAt = null;
+    #[Groups([self::READ, ])]
+    public ?UTCDateTimeImmutable $updatedAt = null;
 }
