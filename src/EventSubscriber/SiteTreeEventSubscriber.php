@@ -91,10 +91,6 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (true === $this->bag->get('whitedigital.site_tree.skip_for_no_security') && null === $this->security->getFirewallConfig($request)) {
-            return;
-        }
-
         try {
             $this->onKernelRequestSymfony($request);
 

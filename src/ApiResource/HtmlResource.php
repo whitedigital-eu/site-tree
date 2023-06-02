@@ -14,7 +14,6 @@ use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
-use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceOrderFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
@@ -39,7 +38,7 @@ use WhiteDigital\SiteTree\Entity\Html;
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
             new Post(
-                denormalizationContext: ['groups' => [self::READ, ], ],
+                denormalizationContext: ['groups' => [self::WRITE, ], ],
             ),
         ],
         normalizationContext: ['groups' => [self::READ, ], ],
@@ -49,7 +48,6 @@ use WhiteDigital\SiteTree\Entity\Html;
         processor: HtmlDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', ]),
     ApiFilter(ResourceNumericFilter::class, properties: ['node.id', ]),
     ApiFilter(ResourceOrderFilter::class, properties: ['node.id', 'id', ]),
     ApiFilter(ResourceSearchFilter::class, properties: ['content', ]),

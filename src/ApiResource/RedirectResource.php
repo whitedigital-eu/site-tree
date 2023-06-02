@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
-use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceOrderFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
@@ -50,7 +49,6 @@ use WhiteDigital\SiteTree\Entity\Redirect;
         processor: RedirectDataProcessor::class,
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
-    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', ]),
     ApiFilter(ResourceNumericFilter::class, properties: ['node.id', 'code', ]),
     ApiFilter(ResourceOrderFilter::class, properties: ['node.id', 'id', 'code', ]),
     ApiFilter(ResourceSearchFilter::class, properties: ['content', ]),
