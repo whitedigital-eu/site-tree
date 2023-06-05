@@ -62,6 +62,7 @@ class SiteTreeBundle extends AbstractBundle
                 ->arrayPrototype()
                     ->children()
                         ->scalarNode('entity')->defaultValue(null)->end()
+                        ->booleanNode('single')->defaultValue(false)->end()
                     ->end()
                 ->end()
             ->end()
@@ -94,9 +95,11 @@ class SiteTreeBundle extends AbstractBundle
         $types = [
             'html' => [
                 'entity' => Html::class,
+                'single' => false,
             ],
             'redirect' => [
                 'entity' => Redirect::class,
+                'single' => false,
             ],
         ];
 
@@ -112,6 +115,7 @@ class SiteTreeBundle extends AbstractBundle
 
             $types[$type] = [
                 'entity' => $entity,
+                'single' => (bool) ($value['single'] ?? false),
             ];
         }
 

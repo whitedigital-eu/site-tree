@@ -45,7 +45,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 normalizationContext: ['groups' => [self::READ, ], ],
             ),
             new Patch(
-                uriTemplate: '/site_trees/{id}/up',
+                uriTemplate: '/site_trees/{id}/' . SiteTreeMovementDataProcessor::UP,
                 requirements: ['id' => '\d+', ],
                 status: Response::HTTP_NO_CONTENT,
                 openapi: new Model\Operation(
@@ -60,7 +60,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
-                uriTemplate: '/site_trees/{id}/down',
+                uriTemplate: '/site_trees/{id}/' . SiteTreeMovementDataProcessor::DOWN,
                 requirements: ['id' => '\d+', ],
                 status: Response::HTTP_NO_CONTENT,
                 openapi: new Model\Operation(
@@ -75,7 +75,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
-                uriTemplate: '/site_trees/{id}/top',
+                uriTemplate: '/site_trees/{id}/' . SiteTreeMovementDataProcessor::TOP,
                 requirements: ['id' => '\d+', ],
                 status: Response::HTTP_NO_CONTENT,
                 openapi: new Model\Operation(
@@ -90,7 +90,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
                 processor: SiteTreeMovementDataProcessor::class,
             ),
             new Patch(
-                uriTemplate: '/site_trees/{id}/bottom',
+                uriTemplate: '/site_trees/{id}/' . SiteTreeMovementDataProcessor::BOTTOM,
                 requirements: ['id' => '\d+', ],
                 status: Response::HTTP_NO_CONTENT,
                 openapi: new Model\Operation(

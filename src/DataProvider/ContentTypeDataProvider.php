@@ -57,7 +57,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
             $found = $found->getNode();
         } else {
             foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
-                $items = $this->em->getRepository($type['entity'])->findBy(['node' => $found, 'isActive' => true]);
+                $items = $this->em->getRepository($type['entity'])->findBy(['node' => $found]);
                 if ([] !== $items) {
                     $entities[] = $items;
                 }
