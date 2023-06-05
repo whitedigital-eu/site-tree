@@ -4,6 +4,7 @@ namespace WhiteDigital\SiteTree\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
 use WhiteDigital\SiteTree\DataProvider\TypeDataProvider;
 
 #[
@@ -11,7 +12,11 @@ use WhiteDigital\SiteTree\DataProvider\TypeDataProvider;
         shortName: 'SiteTree',
         operations: [
             new GetCollection(
-                uriTemplate: '/types',
+                uriTemplate: '/available_types',
+                openapi: new Model\Operation(
+                    summary: 'Returns list of available content types',
+                    description: 'Returns list of available content types',
+                ),
             ),
         ],
         paginationClientEnabled: false,
