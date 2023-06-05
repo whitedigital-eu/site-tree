@@ -4,3 +4,4 @@ tree_node_already_exists: 'Viena līmeņa ietvaros slug ir jābūt unikāla, slu
 empty_slug_above_zero: 'Slug var būt tukšs tikai root (0) līmenī'
 named_resource_not_found: 'Resurss %resource%:%id% nav atrasts'
 tree_resources_not_found: 'Koka ieraksts atrasts, bet tam nav neviena saistītā resursa'
+item_exists_in_parent: 'Resurss ar doto slug (%slug%) jau eksistē padotajā vecākā'

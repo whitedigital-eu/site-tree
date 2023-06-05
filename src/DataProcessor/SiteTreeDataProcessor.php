@@ -6,6 +6,7 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -95,6 +96,22 @@ class SiteTreeDataProcessor extends AbstractDataProcessor
 
         if ([] !== $res) {
             throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $slug], domain: 'SiteTree'));
+        }
+
+        $entities = new ArrayCollection();
+        foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
+            $items = $this->entityManager->getRepository($type['entity'])->findBy(['node' => $entity->getParent(), 'slug' => $slug]);
+            if ([] !== $items) {
+                foreach ($items as $item) {
+                    if (!$entities->contains($item)) {
+                        $entities->add($item);
+                    }
+                }
+            }
+        }
+
+        if ($entities->count()) {
+            throw new UnprocessableEntityHttpException($this->translator->trans('item_exists_in_parent', ['%slug%' => $slug], domain: 'SiteTree'));
         }
 
         return $entity;
