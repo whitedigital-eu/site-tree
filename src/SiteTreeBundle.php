@@ -25,6 +25,7 @@ use function is_subclass_of;
 use function sprintf;
 use function str_contains;
 use function str_starts_with;
+use function strtolower;
 use function strtr;
 use function ucfirst;
 
@@ -196,7 +197,7 @@ class SiteTreeBundle extends AbstractBundle
             if (Request::METHOD_GET === $method) {
                 $default = true;
             }
-            $c->booleanNode($method)->defaultValue($default)->end();
+            $c->booleanNode(strtolower($method))->defaultValue($default)->end();
         }
 
         $c
