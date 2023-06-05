@@ -44,7 +44,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $found = $this->finder->findContentType($uriVariables['id']);
+        $found = $this->finder->findContentType($uriVariables['slug']);
 
         $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::ITEM_GET, $operation->getClass()));
         $this->authorizationService->authorizeSingleObject($found, AuthorizationService::ITEM_GET);
@@ -64,10 +64,6 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
             }
 
             $entities = array_merge(...$entities);
-            if ([] !== $entities) {
-                $resource->resources = $entities;
-            }
-
             if ([] === $entities) {
                 throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
             }
@@ -76,6 +72,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         $resource->nodeId = $found->getId();
         $resource->node = SiteTreeResource::create($found, $context);
         $resource->type = $found->getType();
+        $resource->slug = $uriVariables['slug'];
 
         return $resource;
     }

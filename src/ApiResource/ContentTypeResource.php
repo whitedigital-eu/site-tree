@@ -2,10 +2,11 @@
 
 namespace WhiteDigital\SiteTree\ApiResource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\OpenApi\Model;
-use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
 
 #[
@@ -13,8 +14,11 @@ use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
         shortName: 'SiteTree',
         operations: [
             new Get(
-                uriTemplate: '/content_types/{id}',
-                requirements: ['id' => '.+', ],
+                uriTemplate: '/content_types/{slug}',
+                uriVariables: [
+                    'slug' => new Link(fromProperty: 'slug', fromClass: self::class, identifiers: ['slug']),
+                ],
+                requirements: ['slug' => '.+', ],
                 openapi: new Model\Operation(
                     summary: 'Check if given slug (id) is a valid site tree slug',
                     description: 'Check if given slug (id) is a valid site tree slug',
@@ -36,6 +40,6 @@ class ContentTypeResource
 
     public mixed $resource = null;
 
-    /** @var BaseResource[]|null */
-    public ?array $resources = null;
+    #[ApiProperty(identifier: true)]
+    public ?string $slug = null;
 }
