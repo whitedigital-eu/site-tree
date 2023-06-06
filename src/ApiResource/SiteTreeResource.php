@@ -121,7 +121,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
             ),
             new Patch(
                 requirements: ['id' => '\d+', ],
-                denormalizationContext: ['groups' => [self::WRITE, ], ],
+                denormalizationContext: ['groups' => [self::PATCH, ], ],
             ),
             new Post(
                 denormalizationContext: ['groups' => [self::WRITE, ], ],
@@ -150,10 +150,10 @@ class SiteTreeResource extends BaseResource
     #[Groups([self::READ, ])]
     public mixed $id = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     public ?self $root = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     public ?int $level = null;
 
     #[Groups([self::READ, ])]
@@ -161,27 +161,27 @@ class SiteTreeResource extends BaseResource
 
     public ?int $right = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::PATCH, ])]
     public bool $isActive = false;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::PATCH, ])]
     public bool $isVisible = true;
 
-    #[Groups([self::WRITE, ])]
+    #[Groups([self::WRITE, self::PATCH, ])]
     public ?self $parent = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[Assert\NotBlank]
     public ?string $title = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[Assert\NotBlank]
     public ?string $slug = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     public ?string $metaTitle = null;
 
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     public ?string $metaDescription = null;
 
     #[Groups([self::READ, self::WRITE, ])]
@@ -190,7 +190,7 @@ class SiteTreeResource extends BaseResource
     public ?string $type = null;
 
     /** @var self[]|null */
-    #[Groups([self::READ, self::WRITE, ])]
+    #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[SkipCircularReferenceCheck]
     public ?array $children = null;
 }
