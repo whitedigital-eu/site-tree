@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Attribute\SkipCircularReferenceCheck;
+use WhiteDigital\EntityResourceMapper\Filters\ResourceBooleanFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceExistsFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
@@ -134,6 +135,7 @@ use WhiteDigital\SiteTree\Validator\Constraints\AllowedType;
     ),
     ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'groups', 'overrideDefaultGroups' => false, ]),
     ApiFilter(ResourceExistsFilter::class, properties: ['parent', ]),
+    ApiFilter(ResourceBooleanFilter::class, properties: ['isActive', 'isVisible']),
     ApiFilter(ResourceNumericFilter::class, properties: ['level', 'parent.id', ]),
     ApiFilter(ResourceSearchFilter::class, properties: ['slug', 'slug', 'title', 'type', ]),
 ]
