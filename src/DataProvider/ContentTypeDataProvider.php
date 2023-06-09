@@ -73,6 +73,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         $resource->node = SiteTreeResource::create($found, $context);
         $resource->type = $found->getType();
         $resource->slug = $uriVariables['slug'];
+        $resource->resources = $entities;
 
         return $resource;
     }

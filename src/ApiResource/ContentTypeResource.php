@@ -42,4 +42,6 @@ class ContentTypeResource
 
     #[ApiProperty(identifier: true)]
     public ?string $slug = null;
+
+    public array $resources = [];
 }
