@@ -153,6 +153,7 @@ class SiteTreeResource extends BaseResource
     public mixed $id = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
+    #[ApiProperty(openapiContext: ['example' => '/api/site_trees/1', ])]
     public ?self $root = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
@@ -170,6 +171,7 @@ class SiteTreeResource extends BaseResource
     public bool $isVisible = true;
 
     #[Groups([self::WRITE, self::PATCH, ])]
+    #[ApiProperty(openapiContext: ['example' => '/api/site_trees/1', ])]
     public ?self $parent = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
@@ -194,5 +196,6 @@ class SiteTreeResource extends BaseResource
     /** @var self[]|null */
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[SkipCircularReferenceCheck]
+    #[ApiProperty(openapiContext: ['example' => ['/api/site_trees/1'], ])]
     public ?array $children = null;
 }

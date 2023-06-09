@@ -34,6 +34,7 @@ class ContentTypeResource
 {
     public ?int $nodeId = null;
 
+    #[ApiProperty(openapiContext: ['example' => '/api/site_trees/1', ])]
     public ?SiteTreeResource $node = null;
 
     public ?string $type = null;
