@@ -8,6 +8,7 @@ use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'ct_html')]
 #[Mapping(HtmlResource::class)]
 class Html extends AbstractNodeEntity
 {

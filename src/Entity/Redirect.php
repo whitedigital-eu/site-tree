@@ -7,6 +7,7 @@ use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\SiteTree\ApiResource\RedirectResource;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'ct_redirect')]
 #[Mapping(RedirectResource::class)]
 class Redirect extends AbstractNodeEntity
 {
