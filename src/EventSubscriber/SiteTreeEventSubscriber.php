@@ -32,6 +32,7 @@ use function filter_var;
 use function implode;
 use function in_array;
 use function str_starts_with;
+use function strtolower;
 
 use const FILTER_SANITIZE_URL;
 use const FILTER_VALIDATE_URL;
@@ -101,7 +102,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (($allowed = $this->bag->get('whitedigital.site_tree.allowed_methods')) && !in_array($request->getMethod(), $allowed, true)) {
+        if (($allowed = $this->bag->get('whitedigital.site_tree.allowed_methods')) && !in_array(strtolower($request->getMethod()), $allowed, true)) {
             throw $this->getException($request, new MethodNotAllowedException($allowed));
         }
 
