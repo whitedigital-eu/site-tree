@@ -74,4 +74,8 @@ class RedirectResource extends BaseResource
     #[Groups([self::READ, self::WRITE, ])]
     #[Assert\NotBlank]
     public ?string $content = null;
+
+    #[Groups([self::READ, self::WRITE, ])]
+    #[Assert\NotNull]
+    public bool $isExternal = false;
 }

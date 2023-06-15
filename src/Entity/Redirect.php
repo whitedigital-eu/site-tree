@@ -17,12 +17,15 @@ class Redirect extends AbstractNodeEntity
     #[ORM\Column(nullable: false)]
     protected ?string $content = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    protected bool $isExternal = false;
+
     public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function setContent(?string $content): self
+    public function setContent(?string $content): static
     {
         $this->content = $content;
 
@@ -34,9 +37,21 @@ class Redirect extends AbstractNodeEntity
         return $this->code;
     }
 
-    public function setCode(?int $code): self
+    public function setCode(?int $code): static
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getIsExternal(): bool
+    {
+        return $this->isExternal;
+    }
+
+    public function setIsExternal(bool $isExternal): static
+    {
+        $this->isExternal = $isExternal;
 
         return $this;
     }

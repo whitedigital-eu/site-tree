@@ -31,6 +31,7 @@ use function array_merge;
 use function filter_var;
 use function implode;
 use function in_array;
+use function ltrim;
 use function str_starts_with;
 use function strtolower;
 
@@ -116,12 +117,17 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         }
 
         if ($found instanceof SiteTree && 'redirect' === $found->getType()) {
-            $redirect = $this->em->getRepository(Redirect::class)->findOneBy(['node' => $found, 'isActive' => true]);
+            $redirect = $this->em->getRepository(Redirect::class)->findOneBy(['node' => $found]);
             if (null !== $redirect) {
-                $url = $redirect->getContent();
+                if ($redirect->getIsExternal()) {
+                    $url = $redirect->getContent();
 
-                if (false === filter_var(value: filter_var(value: $url, filter: FILTER_SANITIZE_URL), filter: FILTER_VALIDATE_URL)) {
-                    $url = '/' . $url;
+                    if (false === filter_var(value: filter_var(value: $url, filter: FILTER_SANITIZE_URL), filter: FILTER_VALIDATE_URL)) {
+                        $url = '/' . $url;
+                    }
+                } else {
+                    $content = ltrim($redirect->getContent(), '/');
+                    $url = 'https://' . $request->server->get('HTTP_HOST') . '/' . $content;
                 }
 
                 $requestEvent->setResponse(new RedirectResponse($url, $redirect->getCode()));

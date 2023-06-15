@@ -20,7 +20,7 @@ class Html extends AbstractNodeEntity
         return $this->content;
     }
 
-    public function setContent(?string $content): self
+    public function setContent(?string $content): static
     {
         $this->content = $content;
 
