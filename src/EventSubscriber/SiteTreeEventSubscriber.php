@@ -84,7 +84,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         $excludes = array_merge(self::EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes'));
         if (in_array($this->bag->get('kernel.environment'), ['dev', 'test', ], true)) {
-            $excludes = array_merge(self::EXCLUDES, self::DEV_EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes_dev'));
+            $excludes = array_merge($excludes, self::DEV_EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes_dev'));
         }
 
         foreach ($excludes as $exclude) {
