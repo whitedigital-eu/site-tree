@@ -15,6 +15,5 @@ trait SiteTreeNode
     public ?SiteTreeResource $node = null;
 
     #[Groups([self::READ, self::WRITE, ])]
-    #[Assert\NotBlank]
     public ?string $slug = null;
 }

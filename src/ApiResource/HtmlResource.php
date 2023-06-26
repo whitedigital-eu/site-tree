@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceOrderFilter;
@@ -66,6 +65,5 @@ class HtmlResource extends BaseResource
     public mixed $id = null;
 
     #[Groups([self::READ, self::WRITE, ])]
-    #[Assert\NotBlank]
     public ?string $content = null;
 }
