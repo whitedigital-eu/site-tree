@@ -74,7 +74,8 @@ class SiteTreeBundle extends AbstractBundle
             ->end()
             ->arrayNode('excluded_path_prefixes_dev')
                 ->scalarPrototype()->end()
-            ->end();
+            ->end()
+            ->scalarNode('redirect_root_to_slug')->defaultNull()->end();
 
         $this->addMethodsNode($root);
 
