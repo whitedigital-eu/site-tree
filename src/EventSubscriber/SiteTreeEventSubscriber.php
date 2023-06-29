@@ -107,8 +107,9 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         $response = new Response();
         $found = null;
+        $path = $requestEvent->getRequest()->getPathInfo();
 
-        if (null !== ($slug = $this->bag->get('whitedigital.site_tree.redirect_root_to_slug'))) {
+        if (null !== ($slug = $this->bag->get('whitedigital.site_tree.redirect_root_to_slug')) && '/' === $path) {
             $url = 'https://' . $request->server->get('HTTP_HOST') . '/' . ltrim($slug, '/');
             $requestEvent->setResponse(new RedirectResponse($url, Response::HTTP_MOVED_PERMANENTLY));
 
@@ -116,7 +117,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $found = $this->finder->findContentType($requestEvent->getRequest()->getPathInfo());
+            $found = $this->finder->findContentType($path);
         } catch (NotFoundHttpException) {
             $response = new Response(status: Response::HTTP_NOT_FOUND);
         }
