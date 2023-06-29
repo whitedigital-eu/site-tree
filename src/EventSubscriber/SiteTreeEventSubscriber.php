@@ -5,7 +5,6 @@ namespace WhiteDigital\SiteTree\EventSubscriber;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -57,7 +56,6 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
         private ContentTypeFinderService $finder,
-        private Security $security,
     ) {
     }
 
@@ -109,6 +107,13 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         $response = new Response();
         $found = null;
+
+        if (null !== ($slug = $this->bag->get('whitedigital.site_tree.redirect_root_to_slug'))) {
+            $url = 'https://' . $request->server->get('HTTP_HOST') . '/' . ltrim($slug, '/');
+            $requestEvent->setResponse(new RedirectResponse($url, Response::HTTP_MOVED_PERMANENTLY));
+
+            return;
+        }
 
         try {
             $found = $this->finder->findContentType($requestEvent->getRequest()->getPathInfo());
