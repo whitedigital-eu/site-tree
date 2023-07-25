@@ -5,11 +5,10 @@ namespace WhiteDigital\SiteTree\DataProvider;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use WhiteDigital\EntityResourceMapper\DataProvider\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\SiteTree\ApiResource\RedirectResource;
 
-final class RedirectDataProvider extends AbstractDataProvider
+final class RedirectDataProvider extends AbstractContentTypeProvider
 {
     /**
      * @throws ExceptionInterface

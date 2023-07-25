@@ -16,7 +16,6 @@ class RedirectFixture extends Fixture implements DependentFixtureInterface
         for ($i = 0; $i < 10; $i++) {
             /** @noinspection PhpParamsInspection */
             $fixture = (new Redirect())
-                ->setIsActive(true)
                 ->setCode(307)
                 ->setContent('/eos')
                 ->setNode($this->getReference('noderedirect' . $this->randomArrayKey(SiteTreeFixture::$references['redirect'])));

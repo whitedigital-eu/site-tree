@@ -25,6 +25,7 @@ use function is_subclass_of;
 use function sprintf;
 use function str_contains;
 use function str_starts_with;
+use function strtolower;
 use function strtr;
 use function ucfirst;
 
@@ -61,6 +62,7 @@ class SiteTreeBundle extends AbstractBundle
                 ->arrayPrototype()
                     ->children()
                         ->scalarNode('entity')->defaultValue(null)->end()
+                        ->booleanNode('single')->defaultValue(false)->end()
                     ->end()
                 ->end()
             ->end()
@@ -72,7 +74,8 @@ class SiteTreeBundle extends AbstractBundle
             ->end()
             ->arrayNode('excluded_path_prefixes_dev')
                 ->scalarPrototype()->end()
-            ->end();
+            ->end()
+            ->scalarNode('redirect_root_to_slug')->defaultNull()->end();
 
         $this->addMethodsNode($root);
 
@@ -93,9 +96,11 @@ class SiteTreeBundle extends AbstractBundle
         $types = [
             'html' => [
                 'entity' => Html::class,
+                'single' => false,
             ],
             'redirect' => [
                 'entity' => Redirect::class,
+                'single' => false,
             ],
         ];
 
@@ -111,6 +116,7 @@ class SiteTreeBundle extends AbstractBundle
 
             $types[$type] = [
                 'entity' => $entity,
+                'single' => (bool) ($value['single'] ?? false),
             ];
         }
 
@@ -137,8 +143,8 @@ class SiteTreeBundle extends AbstractBundle
         $this->addApiPlatformPaths($container, self::PATHS);
 
         if ([] !== $audit) {
-            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager']);
-            $this->addDoctrineConfig($container, $audit['audit_entity_manager'], 'SiteTree', self::MAPPINGS, $mappings);
+            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager'] ?? 'default');
+            $this->addDoctrineConfig($container, $audit['audit_entity_manager'] ?? 'audit', 'SiteTree', self::MAPPINGS, $mappings);
         }
 
         $stof = [
@@ -196,7 +202,7 @@ class SiteTreeBundle extends AbstractBundle
             if (Request::METHOD_GET === $method) {
                 $default = true;
             }
-            $c->booleanNode($method)->defaultValue($default)->end();
+            $c->booleanNode(strtolower($method))->defaultValue($default)->end();
         }
 
         $c

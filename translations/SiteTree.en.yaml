@@ -4,3 +4,5 @@ tree_node_already_exists: 'Slug must be unique within same level, slug "%slug%" 
 empty_slug_above_zero: 'Only root level (0) nodes can have empty slug'
 named_resource_not_found: 'Resource %resource%:%id% not found'
 tree_resources_not_found: 'Tree record found, but it has no linked resources'
+item_exists_in_parent: 'Resource with given slug (%slug%) already exists in parent node'
+operation_not_supported: 'Operation not supported'

@@ -30,7 +30,9 @@ use function array_merge;
 use function filter_var;
 use function implode;
 use function in_array;
+use function ltrim;
 use function str_starts_with;
+use function strtolower;
 
 use const FILTER_SANITIZE_URL;
 use const FILTER_VALIDATE_URL;
@@ -80,7 +82,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         $excludes = array_merge(self::EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes'));
         if (in_array($this->bag->get('kernel.environment'), ['dev', 'test', ], true)) {
-            $excludes = array_merge(self::EXCLUDES, self::DEV_EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes_dev'));
+            $excludes = array_merge($excludes, self::DEV_EXCLUDES, $this->bag->get('whitedigital.site_tree.excluded_path_prefixes_dev'));
         }
 
         foreach ($excludes as $exclude) {
@@ -99,26 +101,39 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (($allowed = $this->bag->get('whitedigital.site_tree.allowed_methods')) && !in_array($request->getMethod(), $allowed, true)) {
+        if (($allowed = $this->bag->get('whitedigital.site_tree.allowed_methods')) && !in_array(strtolower($request->getMethod()), $allowed, true)) {
             throw $this->getException($request, new MethodNotAllowedException($allowed));
         }
 
         $response = new Response();
         $found = null;
+        $path = $requestEvent->getRequest()->getPathInfo();
+
+        if (null !== ($slug = $this->bag->get('whitedigital.site_tree.redirect_root_to_slug')) && '/' === $path) {
+            $url = 'https://' . $request->server->get('HTTP_HOST') . '/' . ltrim($slug, '/');
+            $requestEvent->setResponse(new RedirectResponse($url, Response::HTTP_MOVED_PERMANENTLY));
+
+            return;
+        }
 
         try {
-            $found = $this->finder->findContentType($requestEvent->getRequest()->getPathInfo());
+            $found = $this->finder->findContentType($path);
         } catch (NotFoundHttpException) {
             $response = new Response(status: Response::HTTP_NOT_FOUND);
         }
 
         if ($found instanceof SiteTree && 'redirect' === $found->getType()) {
-            $redirect = $this->em->getRepository(Redirect::class)->findOneBy(['node' => $found, 'isActive' => true]);
+            $redirect = $this->em->getRepository(Redirect::class)->findOneBy(['node' => $found]);
             if (null !== $redirect) {
-                $url = $redirect->getContent();
+                if ($redirect->getIsExternal()) {
+                    $url = $redirect->getContent();
 
-                if (false === filter_var(value: filter_var(value: $url, filter: FILTER_SANITIZE_URL), filter: FILTER_VALIDATE_URL)) {
-                    $url = '/' . $url;
+                    if (false === filter_var(value: filter_var(value: $url, filter: FILTER_SANITIZE_URL), filter: FILTER_VALIDATE_URL)) {
+                        $url = '/' . $url;
+                    }
+                } else {
+                    $content = ltrim($redirect->getContent(), '/');
+                    $url = 'https://' . $request->server->get('HTTP_HOST') . '/' . $content;
                 }
 
                 $requestEvent->setResponse(new RedirectResponse($url, $redirect->getCode()));

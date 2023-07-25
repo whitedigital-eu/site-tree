@@ -6,6 +6,7 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -15,19 +16,15 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
-use function end;
-use function explode;
 use function in_array;
 use function preg_match;
 use function rtrim;
-use function str_replace;
 
-final class SiteTreeDataProcessor extends AbstractDataProcessor
+class SiteTreeDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {
@@ -44,15 +41,12 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
     {
         if (!$operation instanceof DeleteOperationInterface) {
             if ($operation instanceof Patch) {
-                if (null === ($entity = $this->move($operation, $data, $context))) {
-                    $entity = $this->patch($data, $operation, $context);
-                }
+                $entity = $this->patch($data, $operation, $context);
             } else {
                 $entity = $this->post($data, $operation, $context);
             }
 
             $this->flushAndRefresh($entity);
-            /* @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->entityManager->getRepository($this->getEntityClass())->recover();
             $this->flushAndRefresh($entity);
 
@@ -90,8 +84,34 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
             $select = ['slug' => $slug, 'parent' => $entity->getParent()];
         }
 
-        if ([] !== $this->entityManager->getRepository($this->getEntityClass())->findBy($select)) {
+        $res = $this->entityManager->getRepository($this->getEntityClass())->findBy($select);
+        if (in_array($entity, $res, true)) {
+            foreach ($res as $key => $item) {
+                if ($item === $entity) {
+                    unset($res[$key]);
+                    break;
+                }
+            }
+        }
+
+        if ([] !== $res) {
             throw new UnprocessableEntityHttpException($this->translator->trans('tree_node_already_exists', ['%level%' => $level, '%slug%' => $slug], domain: 'SiteTree'));
+        }
+
+        $entities = new ArrayCollection();
+        foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
+            $items = $this->entityManager->getRepository($type['entity'])->findBy(['node' => $entity->getParent(), 'slug' => $slug]);
+            if ([] !== $items) {
+                foreach ($items as $item) {
+                    if (!$entities->contains($item)) {
+                        $entities->add($item);
+                    }
+                }
+            }
+        }
+
+        if ($entities->count()) {
+            throw new UnprocessableEntityHttpException($this->translator->trans('item_exists_in_parent', ['%slug%' => $slug], domain: 'SiteTree'));
         }
 
         return $entity;
@@ -109,56 +129,15 @@ final class SiteTreeDataProcessor extends AbstractDataProcessor
 
     protected function removeWithFkCheck(BaseEntity $entity): void
     {
-        /* @noinspection PhpPossiblePolymorphicInvocationInspection */
         $this->entityManager->getRepository($this->getEntityClass())->removeFromTree($entity);
 
         try {
             $this->entityManager->flush();
         } catch (\Exception $exception) {
             preg_match('/DETAIL: (.*)/', $exception->getMessage(), $matches);
-            throw new AccessDeniedHttpException($this->translator->trans('unable_to_delete_record', ['detail' => $matches[1]], domain: 'ApiResource'), $exception);
+            throw new AccessDeniedHttpException($this->translator->trans('unable_to_delete_record', ['detail' => $matches[1]], domain: 'EntityResourceMapper'), $exception);
         }
 
         $this->entityManager->clear();
-    }
-
-    /**
-     * @throws Exception
-     *
-     * @noinspection PhpPossiblePolymorphicInvocationInspection
-     */
-    private function moveNode(mixed $data, string $position, array $context = [], ?int $places = null): ?BaseEntity
-    {
-        $this->authorizationService->authorizeSingleObject($data, AuthorizationService::ITEM_PATCH);
-        $existingEntity = $this->findById($this->getEntityClass(), $data->id);
-
-        $entity = $this->createEntity($data, $context, $existingEntity);
-
-        match ($position) {
-            'up', 'top' => $this->entityManager->getRepository($this->getEntityClass())->moveUp($entity, $places ?? true),
-            'down', 'bottom' => $this->entityManager->getRepository($this->getEntityClass())->moveDown($entity, $places ?? true),
-            default => null,
-        };
-
-        return $entity;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function move(Operation $operation, mixed $data, array $context = []): ?BaseEntity
-    {
-        if (in_array(SiteTreeResource::MOVE, $operation->getDenormalizationContext()['groups'] ?? [], true)) {
-            $parts = explode('/', $operation->getName());
-            $position = str_replace('_patch', '', end($parts));
-
-            return match ($position) {
-                'up', 'down' => $this->moveNode($data, $position, $context, 1),
-                'top', 'bottom' => $this->moveNode($data, $position, $context),
-                default => null,
-            };
-        }
-
-        return null;
     }
 }

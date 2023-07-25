@@ -44,37 +44,35 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $found = $this->finder->findContentType($uriVariables['id']);
+        $found = $this->finder->findContentType($uriVariables['slug']);
 
         $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::ITEM_GET, $operation->getClass()));
         $this->authorizationService->authorizeSingleObject($found, AuthorizationService::ITEM_GET);
 
         $entities = [[]];
         $resource = new ContentTypeResource();
+
         if (!$found instanceof SiteTree) {
             $resource->resource = $found;
             $found = $found->getNode();
         } else {
             foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
-                $items = $this->em->getRepository($type['entity'])->findBy(['node' => $found, 'isActive' => true]);
+                $items = $this->em->getRepository($type['entity'])->findBy(['node' => $found]);
                 if ([] !== $items) {
                     $entities[] = $items;
                 }
             }
-        }
 
-        $entities = array_merge(...$entities);
-        if ([] !== $entities) {
-            $resource->resources = $entities;
-        }
-
-        if ([] === $entities) {
-            throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
+            $entities = array_merge(...$entities);
+            if ([] === $entities) {
+                throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
+            }
         }
 
         $resource->nodeId = $found->getId();
         $resource->node = SiteTreeResource::create($found, $context);
         $resource->type = $found->getType();
+        $resource->slug = $uriVariables['slug'];
 
         return $resource;
     }

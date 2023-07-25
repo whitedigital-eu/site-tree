@@ -19,7 +19,6 @@ use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 class SiteTree extends BaseEntity
 {
     use Id;
-    use Traits\Active;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     #[ORM\OrderBy(['left' => Criteria::ASC])]
@@ -65,9 +64,24 @@ class SiteTree extends BaseEntity
     #[ORM\Column(nullable: true)]
     protected ?string $metaDescription = null;
 
+    #[ORM\Column(nullable: false)]
+    protected ?bool $isActive = null;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
     }
 
     public function getChildren(): Collection
@@ -75,7 +89,7 @@ class SiteTree extends BaseEntity
         return $this->children;
     }
 
-    public function setChildren(Collection $children): self
+    public function setChildren(Collection $children): static
     {
         $this->children = $children;
 
@@ -87,7 +101,7 @@ class SiteTree extends BaseEntity
         return $this->parent;
     }
 
-    public function setParent(?self $parent): self
+    public function setParent(?self $parent): static
     {
         $this->parent = $parent;
 
@@ -99,7 +113,7 @@ class SiteTree extends BaseEntity
         return $this->root;
     }
 
-    public function setRoot(?self $root): self
+    public function setRoot(?self $root): static
     {
         $this->root = $root;
 
@@ -111,7 +125,7 @@ class SiteTree extends BaseEntity
         return $this->isVisible;
     }
 
-    public function setIsVisible(?bool $isVisible): self
+    public function setIsVisible(?bool $isVisible): static
     {
         $this->isVisible = $isVisible;
 
@@ -123,7 +137,7 @@ class SiteTree extends BaseEntity
         return $this->title;
     }
 
-    public function setTitle(?string $title): self
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
 
@@ -135,7 +149,7 @@ class SiteTree extends BaseEntity
         return $this->slug;
     }
 
-    public function setSlug(?string $slug): self
+    public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
 
@@ -147,7 +161,7 @@ class SiteTree extends BaseEntity
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(?string $metaTitle): self
+    public function setMetaTitle(?string $metaTitle): static
     {
         $this->metaTitle = $metaTitle;
 
@@ -159,7 +173,7 @@ class SiteTree extends BaseEntity
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(?string $metaDescription): self
+    public function setMetaDescription(?string $metaDescription): static
     {
         $this->metaDescription = $metaDescription;
 
@@ -171,7 +185,7 @@ class SiteTree extends BaseEntity
         return $this->type;
     }
 
-    public function setType(?string $type): self
+    public function setType(?string $type): static
     {
         $this->type = $type;
 
@@ -183,7 +197,7 @@ class SiteTree extends BaseEntity
         return $this->level;
     }
 
-    public function setLevel(?int $level): self
+    public function setLevel(?int $level): static
     {
         $this->level = $level;
 
@@ -195,7 +209,7 @@ class SiteTree extends BaseEntity
         return $this->left;
     }
 
-    public function setLeft(?int $left): self
+    public function setLeft(?int $left): static
     {
         $this->left = $left;
 
@@ -207,7 +221,7 @@ class SiteTree extends BaseEntity
         return $this->right;
     }
 
-    public function setRight(?int $right): self
+    public function setRight(?int $right): static
     {
         $this->right = $right;
 

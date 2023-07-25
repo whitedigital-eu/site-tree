@@ -43,6 +43,10 @@ final class SiteTreeDataProvider extends AbstractDataProvider
         $queryBuilder = $this->entityManager->getRepository($this->getEntityClass($operation))->getChildrenQueryBuilder();
         $queryBuilder->orderBy('node.root, node.left');
 
+        if (!$this->security->getUser()) {
+            $queryBuilder->where('node.isActive = true');
+        }
+
         $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::COL_GET, $operation->getClass()));
         $this->authorizationService->limitGetCollection($operation->getClass(), $queryBuilder);
 

@@ -153,3 +153,17 @@ In dev/test environment:
 - `/_profiler`  
 - `/_wdt`  
 - `/_error`  
+
+### For more advanced security, all custom content types should extend `AbstractContentTypeProvider`
+If you have any custom content types that are accessed publicly, you should 
+use `AbstractContentTypeProvider` as a base provider so poblicly you
+can access only type data from active site tree nodes.
+```php
+use WhiteDigital\SiteTree\DataProvider\AbstractContentTypeProvider;
+
+class CustomContentTypeDataProvider extends AbstractContentTypeProvider {
+    // ...
+}
+```
+If this extension is not possible, you can use `LimitContentTypePublicAccessTrait` to get limiter
+function for use with `Doctrine\Orm\QueryBuilder` for collection and single items.
