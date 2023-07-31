@@ -12,6 +12,8 @@ use WhiteDigital\SiteTree\ApiResource\HtmlResource;
 #[Mapping(HtmlResource::class)]
 class Html extends AbstractNodeEntity
 {
+    public const TYPE = 'html';
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $content = null;
 

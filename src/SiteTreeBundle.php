@@ -97,12 +97,12 @@ class SiteTreeBundle extends AbstractBundle
         }
 
         $types = [
-            'html' => [
+            Html::TYPE => [
                 'entity' => Html::class,
                 'single' => false,
                 'level' => 1,
             ],
-            'redirect' => [
+            Redirect::TYPE => [
                 'entity' => Redirect::class,
                 'single' => false,
                 'level' => 2,

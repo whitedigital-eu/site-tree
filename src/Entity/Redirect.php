@@ -11,6 +11,8 @@ use WhiteDigital\SiteTree\ApiResource\RedirectResource;
 #[Mapping(RedirectResource::class)]
 class Redirect extends AbstractNodeEntity
 {
+    public const TYPE = 'redirect';
+
     #[ORM\Column(nullable: false)]
     protected ?int $code = null;
 

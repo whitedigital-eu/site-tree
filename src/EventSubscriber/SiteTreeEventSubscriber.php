@@ -144,8 +144,12 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             $response = new Response(status: Response::HTTP_NOT_FOUND);
         }
 
-        $view = $this->twig->render($this->bag->get('whitedigital.site_tree.index_template'));
-        $response->setContent($view);
+        try {
+            $view = $this->twig->render($this->bag->get('whitedigital.site_tree.index_template'));
+            $response->setContent($view);
+        } catch (Exception) {
+            $response = new Response(status: Response::HTTP_NOT_FOUND);
+        }
 
         $requestEvent->setResponse($response);
     }
