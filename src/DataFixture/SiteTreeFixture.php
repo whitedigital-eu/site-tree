@@ -5,10 +5,13 @@ namespace WhiteDigital\SiteTree\DataFixture;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Random\Randomizer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 
-use function array_keys;
+use function count;
+use function strtolower;
+use function strtoupper;
 
 class SiteTreeFixture extends Fixture
 {
@@ -20,32 +23,35 @@ class SiteTreeFixture extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $factory = Factory::create($this->bag->get('stof_doctrine_extensions.default_locale'));
-        $factory->seed('whitedigital');
+        $factory = Factory::create('en_US');
+        $factory->seed(2023);
 
-        $types = array_keys($this->bag->get('whitedigital.site_tree.types'));
+        $levels = [];
 
-        for ($i = 0; $i < 3; $i++) {
-            $parent = $root = null;
-            foreach ($types as $key => $type) {
+        foreach ($this->bag->get('whitedigital.site_tree.types') as $type => $options) {
+            $c = $options['single'] ? 1 : 2;
+            for ($i = 0; $i < $c; $i++) {
+                $title = strtoupper($type) . (1 === $c ? '' : '-' . $i);
+                if (0 === $options['level'] && !count($levels[$options['level']] ?? [])) {
+                    $title = $this->bag->get('stof_doctrine_extensions.default_locale');
+                }
                 $fixture = (new SiteTree())
-                    ->setTitle($factory->words(($key + 1) * 2, true))
-                    ->setSlug(str_replace(' ', '_', $factory->words(1, true)))
+                    ->setTitle($title)
+                    ->setSlug(strtolower($title))
                     ->setIsActive(true)
                     ->setIsVisible(true)
-                    ->setMetaTitle($factory->text(25))
-                    ->setMetaDescription($factory->text(75))
                     ->setType($type)
-                    ->setParent($parent);
+                    ->setMetaTitle($factory->words(3, true))
+                    ->setMetaDescription($factory->text(75));
 
-                if (0 === $key) {
-                    $root = $fixture;
+                if (0 < $options['level']) {
+                    $fixture->setParent($levels[$options['level'] - 1][self::randomArrayKey($levels[$options['level'] - 1])]);
                 }
 
-                $fixture->setRoot($root);
+                $levels[$options['level']][] = $fixture;
                 $manager->persist($fixture);
                 $manager->flush();
-                $parent = $fixture;
+
                 $this->addReference($name = 'node' . $type . $i, $fixture);
                 self::$references[$type][] = $name;
             }
@@ -54,5 +60,17 @@ class SiteTreeFixture extends Fixture
         /* @noinspection PhpPossiblePolymorphicInvocationInspection */
         $manager->getRepository(SiteTree::class)->recover();
         $manager->flush();
+    }
+
+    protected static function randomArrayKey(array $array): mixed
+    {
+        return self::randomArrayKeys($array, 1)[0];
+    }
+
+    protected static function randomArrayKeys(array $array, ?int $count = null): array
+    {
+        $count ??= count($array) - 1;
+
+        return (new Randomizer())->pickArrayKeys($array, $count);
     }
 }
