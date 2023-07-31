@@ -19,8 +19,8 @@ use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\EntityResourceMapper\Security\Enum\GrantType;
 use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
 use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
+use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Entity\SiteTree;
-use WhiteDigital\SiteTree\Service\ContentTypeFinderService;
 
 use function array_key_exists;
 use function array_merge;
@@ -32,7 +32,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $em,
         private AuthorizationService $authorizationService,
-        private ContentTypeFinderService $finder,
+        private ContentTypeFinderInterface $finder,
     ) {
     }
 

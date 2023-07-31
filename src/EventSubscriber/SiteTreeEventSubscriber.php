@@ -22,9 +22,9 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Entity\Redirect;
 use WhiteDigital\SiteTree\Entity\SiteTree;
-use WhiteDigital\SiteTree\Service\ContentTypeFinderService;
 
 use function array_merge;
 use function filter_var;
@@ -55,7 +55,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private UrlMatcherInterface $matcher,
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
-        private ContentTypeFinderService $finder,
+        private ContentTypeFinderInterface $finder,
     ) {
     }
 

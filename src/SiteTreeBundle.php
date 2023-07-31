@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineApiPlatformMappings;
 use WhiteDigital\EntityResourceMapper\DependencyInjection\Traits\DefineOrmMappings;
 use WhiteDigital\EntityResourceMapper\EntityResourceMapperBundle;
+use WhiteDigital\SiteTree\DependencyInjection\CompilerPass\ContentTypeFinderCompilerPass;
 use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\Html;
 use WhiteDigital\SiteTree\Entity\Redirect;
@@ -49,6 +50,7 @@ class SiteTreeBundle extends AbstractBundle
         '%kernel.project_dir%/vendor/whitedigital-eu/site-tree/src/ApiResource',
     ];
 
+    /** @noinspection PhpExpressionResultUnusedInspection */
     public function configure(DefinitionConfigurator $definition): void
     {
         $root = $definition
@@ -63,6 +65,7 @@ class SiteTreeBundle extends AbstractBundle
                     ->children()
                         ->scalarNode('entity')->defaultValue(null)->end()
                         ->booleanNode('single')->defaultValue(false)->end()
+                        ->scalarNode('level')->defaultValue(1)->end()
                     ->end()
                 ->end()
             ->end()
@@ -97,10 +100,12 @@ class SiteTreeBundle extends AbstractBundle
             'html' => [
                 'entity' => Html::class,
                 'single' => false,
+                'level' => 1,
             ],
             'redirect' => [
                 'entity' => Redirect::class,
                 'single' => false,
+                'level' => 2,
             ],
         ];
 
@@ -117,8 +122,11 @@ class SiteTreeBundle extends AbstractBundle
             $types[$type] = [
                 'entity' => $entity,
                 'single' => (bool) ($value['single'] ?? false),
+                'level' => (int) ($value['level'] ?? 1),
             ];
         }
+
+        uasort($types, static fn ($a, $b) => $a['level'] <=> $b['level']);
 
         $builder->setParameter('whitedigital.site_tree.types', $types);
 
@@ -184,11 +192,17 @@ class SiteTreeBundle extends AbstractBundle
         return array_merge_recursive(...$builder->getExtensionConfig($package));
     }
 
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new ContentTypeFinderCompilerPass());
+    }
+
     private function filterKeyStartsWith(array $input, string $startsWith): array
     {
         return array_values(array_filter(array: $input, callback: static fn ($key) => str_starts_with(haystack: (string) $key, needle: $startsWith), mode: ARRAY_FILTER_USE_KEY));
     }
 
+    /** @noinspection PhpExpressionResultUnusedInspection */
     private function addMethodsNode(ArrayNodeDefinition $node): void
     {
         $c = $node
