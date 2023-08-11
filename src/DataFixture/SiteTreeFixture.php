@@ -9,7 +9,10 @@ use Random\Randomizer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 
+use function array_column;
+use function array_unique;
 use function count;
+use function in_array;
 use function strtolower;
 use function strtoupper;
 
@@ -28,12 +31,19 @@ class SiteTreeFixture extends Fixture
 
         $levels = [];
 
+        $min = 0;
+        if (!in_array(0, array_unique(array_column($this->bag->get('whitedigital.site_tree.types'), 'level')), true)) {
+            $min = -1;
+        }
+
         foreach ($this->bag->get('whitedigital.site_tree.types') as $type => $options) {
             $c = $options['single'] ? 1 : 2;
             for ($i = 0; $i < $c; $i++) {
                 $title = strtoupper($type) . (1 === $c ? '' : '-' . $i);
-                if (0 === $options['level'] && !count($levels[$options['level']] ?? [])) {
+                $k = $options['level'] + $min;
+                if (0 === $k && !count($levels[$k] ?? [])) {
                     $title = $this->bag->get('stof_doctrine_extensions.default_locale');
+                    $min = 0;
                 }
                 $fixture = (new SiteTree())
                     ->setTitle($title)
@@ -44,11 +54,15 @@ class SiteTreeFixture extends Fixture
                     ->setMetaTitle($factory->words(3, true))
                     ->setMetaDescription($factory->text(75));
 
-                if (0 < $options['level']) {
-                    $fixture->setParent($levels[$options['level'] - 1][self::randomArrayKey($levels[$options['level'] - 1])]);
+                if (0 < $k) {
+                    if ([] !== ($levels[$k - 1] ?? [])) {
+                        if (null !== ($parent = $levels[$k - 1][self::randomArrayKey($levels[$k - 1])] ?? null)) {
+                            $fixture->setParent($parent);
+                        }
+                    }
                 }
 
-                $levels[$options['level']][] = $fixture;
+                $levels[$k][] = $fixture;
                 $manager->persist($fixture);
                 $manager->flush();
 
