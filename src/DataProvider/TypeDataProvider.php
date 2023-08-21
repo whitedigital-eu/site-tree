@@ -5,7 +5,7 @@ namespace WhiteDigital\SiteTree\DataProvider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use WhiteDigital\SiteTree\ApiResource\TypeResource;
+use WhiteDigital\SiteTree\Api\Resource\TypeResource;
 
 final readonly class TypeDataProvider implements ProviderInterface
 {

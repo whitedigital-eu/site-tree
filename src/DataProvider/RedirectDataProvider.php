@@ -6,7 +6,7 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
-use WhiteDigital\SiteTree\ApiResource\RedirectResource;
+use WhiteDigital\SiteTree\Api\Resource\RedirectResource;
 
 final class RedirectDataProvider extends AbstractContentTypeProvider
 {

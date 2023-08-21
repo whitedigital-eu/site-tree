@@ -6,7 +6,7 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ReflectionException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
-use WhiteDigital\SiteTree\ApiResource\HtmlResource;
+use WhiteDigital\SiteTree\Api\Resource\HtmlResource;
 
 final class HtmlDataProvider extends AbstractContentTypeProvider
 {

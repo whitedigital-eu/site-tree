@@ -167,3 +167,45 @@ class CustomContentTypeDataProvider extends AbstractContentTypeProvider {
 ```
 If this extension is not possible, you can use `LimitContentTypePublicAccessTrait` to get limiter
 function for use with `Doctrine\Orm\QueryBuilder` for collection and single items.
+
+### Overriding parts of the bundle
+
+**Overriding default api resources (and therefore api endpoints)**
+
+By default, SiteTree bundle resources is based on `src/Api/Resource` directory contents.  
+If you wish not to use these resources and not expose the api endpoints they provide, just set a custom api resource path
+with a configuration value. If you set it as `null`, api platform will not register api resources located within this
+package.
+
+```yaml
+audit:
+    custom_api_resource_path: '%kernel.project_dir%/src/MyCustomPath'
+#    custom_api_resource_path: null
+```
+
+```php
+use Symfony\Config\SiteTreeConfig;
+
+return static function (SiteTreeConfig $config): void {
+    $config
+        ->customApiResourcePath('%kernel.project_dir%/src/MyCustomPath')
+        // or  ->customApiResourcePath(null);
+};
+```
+After overriding default api resources, do not forget to update ClassMapperConfigurator configuration that is used for
+resource <-> entity mapping in `whitedigital-eu/entity-resource-mapper-bundle`
+```php
+use App\ApiResource\Admin\SiteTreeResource;
+use WhiteDigital\SiteTree\Entity\SiteTree;
+use WhiteDigital\EntityResourceMapper\Mapper\ClassMapper;
+use WhiteDigital\EntityResourceMapper\Mapper\ClassMapperConfiguratorInterface;
+
+final class ClassMapperConfigurator implements ClassMapperConfiguratorInterface
+{
+    public function __invoke(ClassMapper $classMapper): void
+    {
+        $classMapper->registerMapping(SiteTreeResource::class, SiteTree::class);
+    }
+}
+```
+---

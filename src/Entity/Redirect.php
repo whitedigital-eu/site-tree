@@ -4,7 +4,7 @@ namespace WhiteDigital\SiteTree\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
-use WhiteDigital\SiteTree\ApiResource\RedirectResource;
+use WhiteDigital\SiteTree\Api\Resource\RedirectResource;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ct_redirect')]

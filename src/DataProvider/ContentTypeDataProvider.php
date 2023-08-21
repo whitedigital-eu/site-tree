@@ -17,8 +17,8 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\EntityResourceMapper\Security\Enum\GrantType;
-use WhiteDigital\SiteTree\ApiResource\ContentTypeResource;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
+use WhiteDigital\SiteTree\Api\Resource\ContentTypeResource;
+use WhiteDigital\SiteTree\Api\Resource\SiteTreeResource;
 use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 

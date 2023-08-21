@@ -8,7 +8,7 @@ use Doctrine\DBAL\Exception;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
+use WhiteDigital\SiteTree\Api\Resource\SiteTreeResource;
 
 use function abs;
 use function end;

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree\ApiResource;
+namespace WhiteDigital\SiteTree\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -19,6 +19,7 @@ use WhiteDigital\EntityResourceMapper\Filters\ResourceNumericFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceOrderFilter;
 use WhiteDigital\EntityResourceMapper\Filters\ResourceSearchFilter;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
+use WhiteDigital\SiteTree\Api\Traits;
 use WhiteDigital\SiteTree\DataProcessor\RedirectDataProcessor;
 use WhiteDigital\SiteTree\DataProvider\RedirectDataProvider;
 use WhiteDigital\SiteTree\Entity\Redirect;

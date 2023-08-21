@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\ApiResource\HtmlResource;
+use WhiteDigital\SiteTree\Api\Resource\HtmlResource;
 use WhiteDigital\SiteTree\Entity\Html;
 
 final class HtmlDataProcessor extends AbstractDataProcessor
