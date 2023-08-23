@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree\ApiResource;
+namespace WhiteDigital\SiteTree\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;

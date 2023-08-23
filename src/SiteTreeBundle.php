@@ -46,9 +46,7 @@ class SiteTreeBundle extends AbstractBundle
         'mapping' => true,
     ];
 
-    private const PATHS = [
-        '%kernel.project_dir%/vendor/whitedigital-eu/site-tree/src/ApiResource',
-    ];
+    private const API_RESOURCE_PATH = '%kernel.project_dir%/vendor/whitedigital-eu/site-tree/src/Api/Resource';
 
     /** @noinspection PhpExpressionResultUnusedInspection */
     public function configure(DefinitionConfigurator $definition): void
@@ -78,7 +76,8 @@ class SiteTreeBundle extends AbstractBundle
             ->arrayNode('excluded_path_prefixes_dev')
                 ->scalarPrototype()->end()
             ->end()
-            ->scalarNode('redirect_root_to_slug')->defaultNull()->end();
+            ->scalarNode('redirect_root_to_slug')->defaultNull()->end()
+            ->scalarNode('custom_api_resource_path')->defaultNull()->end();
 
         $this->addMethodsNode($root);
 
@@ -143,16 +142,15 @@ class SiteTreeBundle extends AbstractBundle
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $audit = self::getConfig('audit', $builder);
-
-        $manager = self::getConfig('site_tree', $builder)['entity_manager'] ?? 'default';
+        $extensionConfig = self::getConfig('site_tree', $builder);
+        $auditExtensionConfig = self::getConfig('audit', $builder);
+        $manager = $extensionConfig['entity_manager'] ?? 'default';
 
         $this->addDoctrineConfig($container, $manager, 'SiteTree', self::MAPPINGS);
-        $this->addApiPlatformPaths($container, self::PATHS);
 
-        if ([] !== $audit) {
-            $mappings = $this->getOrmMappings($builder, $audit['default_entity_manager'] ?? 'default');
-            $this->addDoctrineConfig($container, $audit['audit_entity_manager'] ?? 'audit', 'SiteTree', self::MAPPINGS, $mappings);
+        if ([] !== $auditExtensionConfig) {
+            $mappings = $this->getOrmMappings($builder, $auditExtensionConfig['default_entity_manager'] ?? 'default');
+            $this->addDoctrineConfig($container, $auditExtensionConfig['audit_entity_manager'] ?? 'audit', 'SiteTree', self::MAPPINGS, $mappings);
         }
 
         $stof = [
@@ -168,6 +166,7 @@ class SiteTreeBundle extends AbstractBundle
         }
 
         $container->extension('stof_doctrine_extensions', $stof);
+        $this->configureApiPlatformExtension($container, $extensionConfig);
     }
 
     public static function getLocale(ContainerBuilder $builder): ?string
@@ -223,5 +222,14 @@ class SiteTreeBundle extends AbstractBundle
             ->end()
             ->end()
             ->end();
+    }
+
+    private function configureApiPlatformExtension(ContainerConfigurator $container, array $extensionConfig): void
+    {
+        if (!array_key_exists('custom_api_resource_path', $extensionConfig)) {
+            $this->addApiPlatformPaths($container, [self::API_RESOURCE_PATH]);
+        } elseif (!empty($extensionConfig['custom_api_resource_path'])) {
+            $this->addApiPlatformPaths($container, [$extensionConfig['custom_api_resource_path']]);
+        }
     }
 }

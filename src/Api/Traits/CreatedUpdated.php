@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree\ApiResource\Traits;
+namespace WhiteDigital\SiteTree\Api\Traits;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use WhiteDigital\EntityResourceMapper\UTCDateTimeImmutable;

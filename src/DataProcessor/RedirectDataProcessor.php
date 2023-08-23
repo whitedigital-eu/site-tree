@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\ApiResource\RedirectResource;
+use WhiteDigital\SiteTree\Api\Resource\RedirectResource;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
 final class RedirectDataProcessor extends AbstractDataProcessor

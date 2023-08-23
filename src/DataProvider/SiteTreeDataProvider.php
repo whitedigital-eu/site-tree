@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProvider\AbstractDataProvider;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
+use WhiteDigital\SiteTree\Api\Resource\SiteTreeResource;
 
 final class SiteTreeDataProvider extends AbstractDataProvider
 {

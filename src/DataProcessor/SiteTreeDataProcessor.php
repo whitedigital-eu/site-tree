@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
+use WhiteDigital\SiteTree\Api\Resource\SiteTreeResource;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 

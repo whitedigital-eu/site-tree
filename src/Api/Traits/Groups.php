@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree\ApiResource\Traits;
+namespace WhiteDigital\SiteTree\Api\Traits;
 
 trait Groups
 {

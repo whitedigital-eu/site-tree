@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace WhiteDigital\SiteTree\ApiResource\Traits;
+namespace WhiteDigital\SiteTree\Api\Traits;
 
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use WhiteDigital\SiteTree\ApiResource\SiteTreeResource;
+use WhiteDigital\SiteTree\Api\Resource\SiteTreeResource;
 
 trait SiteTreeNode
 {

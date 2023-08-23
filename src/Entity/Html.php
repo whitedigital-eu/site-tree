@@ -5,7 +5,7 @@ namespace WhiteDigital\SiteTree\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use WhiteDigital\EntityResourceMapper\Attribute\Mapping;
-use WhiteDigital\SiteTree\ApiResource\HtmlResource;
+use WhiteDigital\SiteTree\Api\Resource\HtmlResource;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ct_html')]
