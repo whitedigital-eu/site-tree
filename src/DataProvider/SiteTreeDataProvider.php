@@ -40,7 +40,7 @@ final class SiteTreeDataProvider extends AbstractDataProvider
     protected function getCollection(Operation $operation, array $context = []): array|object
     {
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $queryBuilder = $this->entityManager->getRepository($this->getEntityClass($operation))->getChildrenQueryBuilder();
+        $queryBuilder = $this->entityManager->getRepository($this->getEntityClass($operation, $context))->getChildrenQueryBuilder();
         $queryBuilder->orderBy('node.root, node.left');
 
         if (!$this->security->getUser()) {

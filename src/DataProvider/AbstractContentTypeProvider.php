@@ -24,7 +24,7 @@ abstract class AbstractContentTypeProvider extends AbstractDataProvider
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->select('e')
-            ->from($entityClass = $this->getEntityClass($operation), 'e')
+            ->from($entityClass = $this->getEntityClass($operation, $context), 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $id);
 
@@ -36,7 +36,7 @@ abstract class AbstractContentTypeProvider extends AbstractDataProvider
 
         $this->throwErrorIfNotExists($entity, strtolower((new ReflectionClass($entityClass))->getShortName()), $id);
         $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::ITEM_GET, $operation->getClass()));
-        $this->authorizationService->authorizeSingleObject($entity, AuthorizationService::ITEM_GET);
+        $this->authorizationService->authorizeSingleObject($entity, AuthorizationService::ITEM_GET, context: $context);
 
         return $this->createResource($entity, $context);
     }
@@ -44,7 +44,7 @@ abstract class AbstractContentTypeProvider extends AbstractDataProvider
     protected function getCollection(Operation $operation, array $context = []): array|object
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->select('e')->from($this->getEntityClass($operation), 'e');
+        $queryBuilder->select('e')->from($this->getEntityClass($operation, $context), 'e');
 
         if (!$this->security->getUser()) {
             $this->limitPublicAccess($queryBuilder);
