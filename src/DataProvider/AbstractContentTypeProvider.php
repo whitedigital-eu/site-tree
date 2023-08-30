@@ -36,7 +36,7 @@ abstract class AbstractContentTypeProvider extends AbstractDataProvider
 
         $this->throwErrorIfNotExists($entity, strtolower((new ReflectionClass($entityClass))->getShortName()), $id);
         $this->authorizationService->setAuthorizationOverride(fn () => $this->override(AuthorizationService::ITEM_GET, $operation->getClass()));
-        $this->authorizationService->authorizeSingleObject($entity, AuthorizationService::ITEM_GET);
+        $this->authorizationService->authorizeSingleObject($entity, AuthorizationService::ITEM_GET, context: $context);
 
         return $this->createResource($entity, $context);
     }
