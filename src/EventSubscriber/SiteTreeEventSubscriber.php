@@ -93,8 +93,6 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         try {
             $this->onKernelRequestSymfony($request);
-
-            return;
         } catch (Exception $exception) {
             if ($exception instanceof MethodNotAllowedHttpException) {
                 throw $exception;
