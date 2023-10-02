@@ -5,7 +5,6 @@ namespace WhiteDigital\SiteTree\DataProvider;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use ReflectionClass;
 use ReflectionException;
@@ -15,6 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use WhiteDigital\EntityResourceMapper\Mapper\EntityToResourceMapper;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\EntityResourceMapper\Security\Enum\GrantType;
 use WhiteDigital\SiteTree\Api\Resource\ContentTypeResource;
@@ -33,14 +33,13 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         private EntityManagerInterface $em,
         private AuthorizationService $authorizationService,
         private ContentTypeFinderInterface $finder,
-    ) {
-    }
+        private EntityToResourceMapper $mapper,
+    ) {}
 
     /**
      * @throws ExceptionInterface
      * @throws ReflectionException
      * @throws ResourceClassNotFoundException
-     * @throws Exception
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
@@ -53,7 +52,7 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
         $resource = new ContentTypeResource();
 
         if (!$found instanceof SiteTree) {
-            $resource->resource = $found;
+            $resource->exactResource = $this->mapper->map($found);
             $found = $found->getNode();
         } else {
             foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
@@ -66,6 +65,11 @@ final readonly class ContentTypeDataProvider implements ProviderInterface
             $entities = array_merge(...$entities);
             if ([] === $entities) {
                 throw new NotFoundHttpException($this->translator->trans('tree_resources_not_found', domain: 'SiteTree'));
+            }
+
+            $resource->linkedResources = [];
+            foreach ($entities as $entity) {
+                $resource->linkedResources[] = $this->mapper->map($entity);
             }
         }
 

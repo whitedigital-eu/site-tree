@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
-use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 
@@ -35,7 +35,7 @@ final readonly class ContentTypeFinder implements ContentTypeFinderInterface
     /**
      * @throws Exception
      */
-    public function findContentType(string $path): SiteTree|AbstractNodeEntity
+    public function findContentType(string $path): BaseEntity
     {
         $slug = $orig = ltrim(rtrim($path, '/'), '/');
         $parts = explode('/', $slug);

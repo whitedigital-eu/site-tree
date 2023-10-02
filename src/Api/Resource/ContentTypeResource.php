@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\OpenApi\Model;
+use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\DataProvider\ContentTypeDataProvider;
 
 #[
@@ -39,7 +40,10 @@ class ContentTypeResource
 
     public ?string $type = null;
 
-    public mixed $resource = null;
+    public ?BaseResource $exactResource = null;
+
+    /** @var BaseResource[]|null */
+    public ?array $linkedResources = null;
 
     public ?string $slug = null;
 }
