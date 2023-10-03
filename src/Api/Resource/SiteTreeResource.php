@@ -180,7 +180,7 @@ class SiteTreeResource extends BaseResource
     public ?string $title = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
-    #[Assert\NotBlank]
+    #[Assert\NotNull]
     public ?string $slug = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]

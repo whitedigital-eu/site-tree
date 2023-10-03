@@ -47,6 +47,7 @@ class SiteTreeDataProcessor extends AbstractDataProcessor
             }
 
             $this->flushAndRefresh($entity);
+            /* @noinspection PhpPossiblePolymorphicInvocationInspection */
             $this->entityManager->getRepository($this->getEntityClass())->recover();
             $this->flushAndRefresh($entity);
 
@@ -69,7 +70,9 @@ class SiteTreeDataProcessor extends AbstractDataProcessor
             $repo = $this->entityManager->getRepository($this->getEntityClass());
             /* @var SiteTreeRepository $repo */
             $entity->setRoot($repo->getRootById($existingEntity->getId()));
-            $entity->setParent($repo->getParentById($existingEntity->getId()));
+            if (null === $entity->getParent()) {
+                $entity->setParent($repo->getParentById($existingEntity->getId()));
+            }
         }
 
         $level = null === $entity->getParent() ? 0 : $entity->getParent()->getLevel() + 1;
@@ -129,6 +132,7 @@ class SiteTreeDataProcessor extends AbstractDataProcessor
 
     protected function removeWithFkCheck(BaseEntity $entity): void
     {
+        /* @noinspection PhpPossiblePolymorphicInvocationInspection */
         $this->entityManager->getRepository($this->getEntityClass())->removeFromTree($entity);
 
         try {
