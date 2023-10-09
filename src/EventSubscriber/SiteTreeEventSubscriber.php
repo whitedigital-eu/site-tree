@@ -2,7 +2,6 @@
 
 namespace WhiteDigital\SiteTree\EventSubscriber;
 
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -19,9 +18,6 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Entity\Redirect;
 use WhiteDigital\SiteTree\Entity\SiteTree;
@@ -56,8 +52,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
         private ContentTypeFinderInterface $finder,
-    ) {
-    }
+    ) {}
 
     public static function getSubscribedEvents(): array
     {
@@ -66,12 +61,6 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws DBALException
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
     public function onKernelRequest(RequestEvent $requestEvent): void
     {
         if (!$requestEvent->isMainRequest()) {
@@ -93,6 +82,9 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         try {
             $this->onKernelRequestSymfony($request);
+            if (null !== $request->attributes->get('_controller')) {
+                return;
+            }
         } catch (Exception $exception) {
             if ($exception instanceof MethodNotAllowedHttpException) {
                 throw $exception;
