@@ -4,6 +4,7 @@ namespace WhiteDigital\SiteTree\EventSubscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use LogicException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -89,6 +90,10 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
             if ($exception instanceof MethodNotAllowedHttpException) {
                 throw $exception;
             }
+
+            if ($exception instanceof LogicException) {
+                return;
+            }
         }
 
         if (($allowed = $this->bag->get('whitedigital.site_tree.allowed_methods')) && !in_array(strtolower($request->getMethod()), $allowed, true)) {
@@ -144,8 +149,12 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         $requestEvent->setResponse($response);
     }
 
-    private function getException(Request $request, MethodNotAllowedException $exception): MethodNotAllowedHttpException
+    private function getException(Request $request, MethodNotAllowedException $exception): MethodNotAllowedHttpException|LogicException
     {
+        if (in_array($request->getMethod(), $exception->getAllowedMethods(), true)) {
+            throw new LogicException($exception->getMessage());
+        }
+
         $message = $this->translator->trans('method_not_allowed', ['%method%' => $request->getMethod(), '%uri%' => $request->getUriForPath($request->getPathInfo()), '%allowed%' => implode(', ', $exception->getAllowedMethods())], domain: 'SiteTree');
 
         return new MethodNotAllowedHttpException($exception->getAllowedMethods(), $message, $exception);
