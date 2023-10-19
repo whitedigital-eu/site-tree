@@ -13,9 +13,7 @@ use function array_rand;
 
 class HtmlFixture extends Fixture implements DependentFixtureInterface
 {
-    public function __construct(private readonly ParameterBagInterface $bag)
-    {
-    }
+    public function __construct(private readonly ParameterBagInterface $bag) {}
 
     public function getDependencies(): array
     {

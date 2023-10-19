@@ -11,8 +11,7 @@ final readonly class TypeDataProvider implements ProviderInterface
 {
     public function __construct(
         private ParameterBagInterface $bag,
-    ) {
-    }
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {

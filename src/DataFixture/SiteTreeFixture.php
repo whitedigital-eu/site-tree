@@ -20,9 +20,7 @@ class SiteTreeFixture extends Fixture
 {
     public static array $references;
 
-    public function __construct(private readonly ParameterBagInterface $bag)
-    {
-    }
+    public function __construct(private readonly ParameterBagInterface $bag) {}
 
     public function load(ObjectManager $manager): void
     {

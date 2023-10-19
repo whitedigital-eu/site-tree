@@ -6,6 +6,4 @@ use Attribute;
 use Symfony\Component\Validator\Constraint;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class AllowedType extends Constraint
-{
-}
+class AllowedType extends Constraint {}

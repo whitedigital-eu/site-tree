@@ -16,8 +16,7 @@ class AllowedTypeValidator extends ConstraintValidator
     public function __construct(
         private readonly ParameterBagInterface $bag,
         private readonly TranslatorInterface $translator,
-    ) {
-    }
+    ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
     {
