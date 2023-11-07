@@ -19,8 +19,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use WhiteDigital\EntityResourceMapper\UTCDateTimeImmutable;
 use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
+use WhiteDigital\SiteTree\Entity\MenuItem;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 
+use function array_key_exists;
 use function array_merge;
 use function in_array;
 use function method_exists;
@@ -56,39 +58,59 @@ class SitemapController extends AbstractController
         } catch (Exception) {
             $root = null;
         }
+        $i = 0;
+        $now = new UTCDateTimeImmutable();
         foreach ($types as $type) {
+            if (MenuItem::TYPE === $type->getType()) {
+                continue;
+            }
+
             try {
                 $slug = $em->getRepository(SiteTree::class)->getSlug($type);
             } catch (DBALException) {
                 continue;
             }
             if ($root === $slug) {
-                $entries[] = [
+                $entries[$i++] = [
                     'loc' => str_replace($fakePath, '', $router->generate('sitemap_gen', referenceType: UrlGeneratorInterface::ABSOLUTE_URL)),
-                    'lastmod' => (new UTCDateTimeImmutable())->format(DateTimeInterface::ATOM),
+                    'lastmod' => $now->format(DateTimeInterface::ATOM),
                 ];
             }
-            $entries[] = [
+            $entries[$i++] = [
                 'loc' => $path = str_replace($fakePath, '', $router->generate('sitemap_gen', ['path' => $slug], UrlGeneratorInterface::ABSOLUTE_URL)),
-                'lastmod' => (new UTCDateTimeImmutable())->format(DateTimeInterface::ATOM),
+                'lastmod' => $now->format(DateTimeInterface::ATOM),
             ];
-            $entities = [];
+            $entities = [[]];
             foreach ($this->getParameter('whitedigital.site_tree.types') as $wdType) {
                 $items = $em->getRepository($wdType['entity'])->findBy(['node' => $type]);
                 if ([] !== $items) {
                     $entities[] = $items;
                 }
             }
-            foreach (array_merge(...$entities) as $entity) {
+            $j = $i - 1;
+            $last = $type->getUpdatedAt() ?? $type->getCreatedAt();
+            $count = count($entities = array_merge(...$entities));
+            if (0 === $count) {
+                $last = $now;
+            }
+            foreach ($entities as $entity) {
+                if (method_exists($entity, 'getIsActive') && !$entity->getIsActive()) {
+                    continue;
+                }
+                $updated = ($entity->getUpdatedAt() ?? $entity->getCreatedAt());
+                $last = $last > $updated ? $last : $updated;
                 if (null !== $entity->getSlug()) {
-                    if (method_exists($entity, 'getIsActive') && !$entity->getIsActive()) {
-                        continue;
-                    }
-                    $entries[] = [
+                    $entries[$i++] = [
                         'loc' => rtrim($path, '/') . '/' . $entity->getSlug(),
-                        'lastmod' => $entity->getUpdatedAt()->format(DateTimeInterface::ATOM),
+                        'lastmod' => $updated->format(DateTimeInterface::ATOM),
                     ];
                 }
+            }
+            if (array_key_exists($j, $entries)) {
+                $entries[$j]['lastmod'] = ($last ?? $now)->format(DateTimeInterface::ATOM);
+            }
+            if ($root === $slug && array_key_exists($j - 1, $entries)) {
+                $entries[$j - 1]['lastmod'] = ($last ?? $now)->format(DateTimeInterface::ATOM);
             }
         }
 
