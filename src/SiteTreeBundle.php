@@ -77,7 +77,13 @@ class SiteTreeBundle extends AbstractBundle
                 ->scalarPrototype()->end()
             ->end()
             ->scalarNode('redirect_root_to_slug')->defaultNull()->end()
-            ->scalarNode('custom_api_resource_path')->defaultNull()->end();
+            ->scalarNode('custom_api_resource_path')->defaultNull()->end()
+            ->arrayNode('sitemap')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('include_invisible')->defaultFalse()->end()
+                ->end()
+            ->end();
 
         $this->addMethodsNode($root);
 

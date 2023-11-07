@@ -38,6 +38,7 @@ final readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 {
     private const EXCLUDES = [
         '/api',
+        'sitemap.xml',
     ];
 
     private const DEV_EXCLUDES = [
