@@ -2,27 +2,45 @@
 
 namespace WhiteDigital\SiteTree\Controller;
 
+use DateTimeInterface;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use WhiteDigital\EntityResourceMapper\UTCDateTimeImmutable;
+use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Entity\SiteTree;
 
+use function array_merge;
+use function in_array;
+use function method_exists;
+use function rtrim;
 use function str_replace;
 
 #[AsController]
 class SitemapController extends AbstractController
 {
-    #[Route('/sitemap.xml', methods: [Request::METHOD_GET], defaults: ['_format' => 'xml'])]
-    public function sitemap(EntityManagerInterface $em)
+    public function __construct(
+        #[TaggedIterator(ContentTypeFinderInterface::class)]
+        private $tagged,
+    ) {}
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
+    #[Route('/sitemap.xml', defaults: ['_format' => 'xml'], methods: [Request::METHOD_GET])]
+    public function sitemap(EntityManagerInterface $em): Response
     {
         $entries = [];
         /** @var RouterInterface $router */
@@ -39,17 +57,48 @@ class SitemapController extends AbstractController
             $root = null;
         }
         foreach ($types as $type) {
-            $slug = $em->getRepository(SiteTree::class)->getSlug($type);
+            try {
+                $slug = $em->getRepository(SiteTree::class)->getSlug($type);
+            } catch (DBALException) {
+                continue;
+            }
             if ($root === $slug) {
                 $entries[] = [
                     'loc' => str_replace($fakePath, '', $router->generate('sitemap_gen', referenceType: UrlGeneratorInterface::ABSOLUTE_URL)),
-                    'lastmod' => $type->getUpdatedAt()->format(UTCDateTimeImmutable::ATOM),
+                    'lastmod' => (new UTCDateTimeImmutable())->format(DateTimeInterface::ATOM),
                 ];
             }
             $entries[] = [
-                'loc' => str_replace($fakePath, '', $router->generate('sitemap_gen', ['path' => $slug], UrlGeneratorInterface::ABSOLUTE_URL)),
-                'lastmod' => $type->getUpdatedAt()->format(UTCDateTimeImmutable::ATOM),
+                'loc' => $path = str_replace($fakePath, '', $router->generate('sitemap_gen', ['path' => $slug], UrlGeneratorInterface::ABSOLUTE_URL)),
+                'lastmod' => (new UTCDateTimeImmutable())->format(DateTimeInterface::ATOM),
             ];
+            $entities = [];
+            foreach ($this->getParameter('whitedigital.site_tree.types') as $wdType) {
+                $items = $em->getRepository($wdType['entity'])->findBy(['node' => $type]);
+                if ([] !== $items) {
+                    $entities[] = $items;
+                }
+            }
+            foreach (array_merge(...$entities) as $entity) {
+                if (null !== $entity->getSlug()) {
+                    if (method_exists($entity, 'getIsActive') && !$entity->getIsActive()) {
+                        continue;
+                    }
+                    $entries[] = [
+                        'loc' => rtrim($path, '/') . '/' . $entity->getSlug(),
+                        'lastmod' => $entity->getUpdatedAt()->format(DateTimeInterface::ATOM),
+                    ];
+                }
+            }
+        }
+
+        $used = [];
+        foreach ($this->tagged as $service) {
+            if (in_array($service::class, $used, true)) {
+                continue;
+            }
+            $used[] = $service::class;
+            $entries = array_merge($entries, $service->getSitemapEntries());
         }
 
         $result = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
@@ -69,9 +118,9 @@ class SitemapController extends AbstractController
         return new Response($result);
     }
 
-    #[Route('/sitemap/0a6402de998c4ffe/{path}', 'sitemap_gen', methods: [Request::METHOD_GET], defaults: ['path' => ''], requirements: ['path' => '.+'])]
-    public function gen()
+    #[Route('/sitemap/0a6402de998c4ffe/{path}', 'sitemap_gen', requirements: ['path' => '.+'], defaults: ['path' => ''], methods: [Request::METHOD_GET])]
+    public function gen(): Response
     {
-        return new NotFoundHttpException();
+        throw $this->createNotFoundException();
     }
 }
