@@ -60,8 +60,14 @@ class SitemapController extends AbstractController
         }
         $i = 0;
         $now = new UTCDateTimeImmutable();
+        $excludes = [];
+        foreach ($this->getParameter('whitedigital.site_tree.types') as $key => $wdType) {
+            if (MenuItem::class === $wdType['entity']) {
+                $excludes[] = $key;
+            }
+        }
         foreach ($types as $type) {
-            if (MenuItem::TYPE === $type->getType()) {
+            if (in_array($type->getType(), $excludes, true)) {
                 continue;
             }
 
