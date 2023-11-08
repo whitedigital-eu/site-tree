@@ -148,6 +148,7 @@ This configuration skips listener logic for any path that starts with these defi
 By default this bundle alrady skip some paths:  
 In any environment:  
 - `/api`
+- `/sitemap.xml`
 
 In dev/test environment:  
 - `/_profiler`  
@@ -178,7 +179,7 @@ with a configuration value. If you set it as `null`, api platform will not regis
 package.
 
 ```yaml
-audit:
+site_tree:
     custom_api_resource_path: '%kernel.project_dir%/src/MyCustomPath'
 #    custom_api_resource_path: null
 ```
@@ -209,3 +210,40 @@ final class ClassMapperConfigurator implements ClassMapperConfiguratorInterface
 }
 ```
 ---
+
+### Sitemap
+
+To add sitemap to `GET /sitemap.xml`, you need to add route configuration to project routes.
+```yaml
+# config/routes/site-tree.yaml
+site_tree:
+    resource: '../vendor/whitedigital-eu/site-tree/src/Controller/'
+    type:     attribute
+```
+```php
+// config/routes/site-tree.php
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+
+return static function (RoutingConfigurator $routes): void {
+    $routes->import('../vendor/whitedigital-eu/site-tree/src/Controller/', 'attribute');
+};
+
+```
+Sitemap only returns enabled routes with `isActive: true` and `isVisible: true`. If you want to
+include invisible (but still active routes) with `isActive: true` and `isVisible: false`, configure
+it in configuration:
+```yaml
+site_tree:
+    #...
+    sitemap:
+        include_invisible: true
+```
+```php
+use Symfony\Config\SiteTreeConfig;
+
+return static function (SiteTreeConfig $config): void {
+    $config
+        ->sitemap()
+            ->includeInvisible(true);
+};
+```

@@ -11,4 +11,6 @@ interface ContentTypeFinderInterface
     public function findContentType(string $path): BaseEntity;
 
     public static function getDefaultPriority(): int;
+
+    public function getSitemapEntries(): array;
 }

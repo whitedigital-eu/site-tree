@@ -89,4 +89,9 @@ final readonly class ContentTypeFinder implements ContentTypeFinderInterface
     {
         return 1;
     }
+
+    public function getSitemapEntries(): array
+    {
+        return [];
+    }
 }

@@ -17,6 +17,7 @@ use WhiteDigital\EntityResourceMapper\EntityResourceMapperBundle;
 use WhiteDigital\SiteTree\DependencyInjection\CompilerPass\ContentTypeFinderCompilerPass;
 use WhiteDigital\SiteTree\Entity\AbstractNodeEntity;
 use WhiteDigital\SiteTree\Entity\Html;
+use WhiteDigital\SiteTree\Entity\MenuItem;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
 use function array_filter;
@@ -77,7 +78,13 @@ class SiteTreeBundle extends AbstractBundle
                 ->scalarPrototype()->end()
             ->end()
             ->scalarNode('redirect_root_to_slug')->defaultNull()->end()
-            ->scalarNode('custom_api_resource_path')->defaultNull()->end();
+            ->scalarNode('custom_api_resource_path')->defaultNull()->end()
+            ->arrayNode('sitemap')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('include_invisible')->defaultFalse()->end()
+                ->end()
+            ->end();
 
         $this->addMethodsNode($root);
 
@@ -105,6 +112,11 @@ class SiteTreeBundle extends AbstractBundle
                 'entity' => Redirect::class,
                 'single' => false,
                 'level' => 2,
+            ],
+            MenuItem::TYPE => [
+                'entity' => MenuItem::class,
+                'single' => false,
+                'level' => 1,
             ],
         ];
 
