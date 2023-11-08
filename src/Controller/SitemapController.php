@@ -60,8 +60,14 @@ class SitemapController extends AbstractController
         }
         $i = 0;
         $now = new UTCDateTimeImmutable();
+        $excludes = [];
+        foreach ($this->getParameter('whitedigital.site_tree.types') as $key => $wdType) {
+            if (MenuItem::class === $wdType['entity']) {
+                $excludes[] = $key;
+            }
+        }
         foreach ($types as $type) {
-            if (MenuItem::TYPE === $type->getType()) {
+            if (in_array($type->getType(), $excludes, true)) {
                 continue;
             }
 
@@ -81,7 +87,12 @@ class SitemapController extends AbstractController
                 'lastmod' => $now->format(DateTimeInterface::ATOM),
             ];
             $entities = [[]];
+            $usedEntities = [];
             foreach ($this->getParameter('whitedigital.site_tree.types') as $wdType) {
+                if (in_array($wdType['entity'], $usedEntities, true)) {
+                    continue;
+                }
+                $usedEntities[] = $wdType['entity'];
                 $items = $em->getRepository($wdType['entity'])->findBy(['node' => $type]);
                 if ([] !== $items) {
                     $entities[] = $items;
