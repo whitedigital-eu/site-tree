@@ -81,7 +81,12 @@ class SitemapController extends AbstractController
                 'lastmod' => $now->format(DateTimeInterface::ATOM),
             ];
             $entities = [[]];
+            $usedEntities = [];
             foreach ($this->getParameter('whitedigital.site_tree.types') as $wdType) {
+                if (in_array($wdType['entity'], $usedEntities, true)) {
+                    continue;
+                }
+                $usedEntities[] = $wdType['entity'];
                 $items = $em->getRepository($wdType['entity'])->findBy(['node' => $type]);
                 if ([] !== $items) {
                     $entities[] = $items;
