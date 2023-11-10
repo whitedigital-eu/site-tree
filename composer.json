@@ -18,20 +18,20 @@
         "doctrine/orm": "*",
         "gedmo/doctrine-extensions": "^3",
         "stof/doctrine-extensions-bundle": "*",
-        "symfony/config": "^6.2",
-        "symfony/dependency-injection": "^6.2",
-        "symfony/event-dispatcher": "^6.2",
-        "symfony/framework-bundle": "^6.2",
-        "symfony/http-foundation": "^6.2",
-        "symfony/http-kernel": "^6.2",
-        "symfony/property-info": "^6.2",
-        "symfony/routing": "^6.2",
-        "symfony/serializer": "^6.2",
-        "symfony/translation": "^6.2",
-        "symfony/twig-bundle": "^6.2",
-        "symfony/validator": "^6.2",
+        "symfony/config": "^6.3",
+        "symfony/dependency-injection": "^6.3",
+        "symfony/event-dispatcher": "^6.3",
+        "symfony/framework-bundle": "^6.3",
+        "symfony/http-foundation": "^6.3",
+        "symfony/http-kernel": "^6.3",
+        "symfony/property-info": "^6.3",
+        "symfony/routing": "^6.3",
+        "symfony/serializer": "^6.3",
+        "symfony/translation": "^6.3",
+        "symfony/twig-bundle": "^6.3",
+        "symfony/validator": "^6.3",
         "twig/twig": "^3",
-        "whitedigital-eu/entity-resource-mapper-bundle": "^0.23"
+        "whitedigital-eu/entity-resource-mapper-bundle": "^0.23|^0.24"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",
@@ -54,7 +54,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.2.x-dev"
+            "dev-main": "0.3.x-dev"
         }
     }
 }
