@@ -31,7 +31,8 @@
         "symfony/twig-bundle": "^6.3",
         "symfony/validator": "^6.3",
         "twig/twig": "^3",
-        "whitedigital-eu/entity-resource-mapper-bundle": "^0.23|^0.24"
+        "whitedigital-eu/entity-resource-mapper-bundle": "^0.23|^0.24",
+        "whitedigital-eu/audit-service": "^0.6|^0.7"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",

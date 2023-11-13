@@ -13,6 +13,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Contracts\Service\Attribute\Required;
+use WhiteDigital\Audit\Contracts\AuditServiceInterface;
+use WhiteDigital\Audit\Contracts\AuditType;
 use WhiteDigital\EntityResourceMapper\DataProcessor\AbstractDataProcessor;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
@@ -23,9 +26,18 @@ use WhiteDigital\SiteTree\Repository\SiteTreeRepository;
 use function in_array;
 use function preg_match;
 use function rtrim;
+use function sprintf;
 
 class SiteTreeDataProcessor extends AbstractDataProcessor
 {
+    protected AuditServiceInterface $audit;
+
+    #[Required]
+    public function setAudit(AuditServiceInterface $audit): void
+    {
+        $this->audit = $audit;
+    }
+
     public function getEntityClass(): string
     {
         return SiteTree::class;
@@ -132,6 +144,8 @@ class SiteTreeDataProcessor extends AbstractDataProcessor
 
     protected function removeWithFkCheck(BaseEntity $entity): void
     {
+        $id = $entity->getId();
+
         /* @noinspection PhpPossiblePolymorphicInvocationInspection */
         $this->entityManager->getRepository($this->getEntityClass())->removeFromTree($entity);
 
@@ -141,6 +155,11 @@ class SiteTreeDataProcessor extends AbstractDataProcessor
             preg_match('/DETAIL: (.*)/', $exception->getMessage(), $matches);
             throw new AccessDeniedHttpException($this->translator->trans('unable_to_delete_record', ['detail' => $matches[1]], domain: 'EntityResourceMapper'), $exception);
         }
+
+        $action = $this->translator->trans('entity.remove', domain: 'Audit');
+        $entityTranslation = $this->translator->trans('entity', domain: 'Audit');
+
+        $this->audit->audit(AuditType::DB, sprintf('%s %s %s', $action, $entityTranslation, $entity::class), ['id' => $id]);
 
         $this->entityManager->clear();
     }
