@@ -11,7 +11,7 @@ use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\Api\Resource\RedirectResource;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
-final class RedirectDataProcessor extends AbstractDataProcessor
+class RedirectDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {

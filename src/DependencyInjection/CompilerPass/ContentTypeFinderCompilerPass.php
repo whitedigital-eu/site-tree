@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Service\ContentTypeFinder;
 
-final readonly class ContentTypeFinderCompilerPass implements CompilerPassInterface
+readonly class ContentTypeFinderCompilerPass implements CompilerPassInterface
 {
     /**
      * @throws ReflectionException

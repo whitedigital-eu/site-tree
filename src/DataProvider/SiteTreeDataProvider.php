@@ -13,7 +13,7 @@ use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\EntityResourceMapper\Security\AuthorizationService;
 use WhiteDigital\SiteTree\Api\Resource\SiteTreeResource;
 
-final class SiteTreeDataProvider extends AbstractDataProvider
+class SiteTreeDataProvider extends AbstractDataProvider
 {
     /**
      * @throws ReflectionException
