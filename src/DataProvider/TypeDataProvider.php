@@ -7,7 +7,7 @@ use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WhiteDigital\SiteTree\Api\Resource\TypeResource;
 
-final readonly class TypeDataProvider implements ProviderInterface
+readonly class TypeDataProvider implements ProviderInterface
 {
     public function __construct(
         private ParameterBagInterface $bag,

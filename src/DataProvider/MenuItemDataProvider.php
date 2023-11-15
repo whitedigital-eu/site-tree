@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\SiteTree\Api\Resource\MenuItemResource;
 
-final class MenuItemDataProvider extends AbstractContentTypeProvider
+class MenuItemDataProvider extends AbstractContentTypeProvider
 {
     /**
      * @throws ExceptionInterface

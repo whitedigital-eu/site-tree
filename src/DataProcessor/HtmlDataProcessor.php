@@ -11,7 +11,7 @@ use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\Api\Resource\HtmlResource;
 use WhiteDigital\SiteTree\Entity\Html;
 
-final class HtmlDataProcessor extends AbstractDataProcessor
+class HtmlDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {

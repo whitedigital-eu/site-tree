@@ -20,7 +20,7 @@ use function ltrim;
 use function rtrim;
 use function substr_count;
 
-final readonly class ContentTypeFinder implements ContentTypeFinderInterface
+readonly class ContentTypeFinder implements ContentTypeFinderInterface
 {
     private SiteTreeRepository $repository;
 

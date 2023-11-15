@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\SiteTree\Api\Resource\HtmlResource;
 
-final class HtmlDataProvider extends AbstractContentTypeProvider
+class HtmlDataProvider extends AbstractContentTypeProvider
 {
     /**
      * @throws ExceptionInterface

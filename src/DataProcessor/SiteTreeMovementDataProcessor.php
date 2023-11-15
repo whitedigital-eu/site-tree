@@ -16,7 +16,7 @@ use function explode;
 use function in_array;
 use function str_replace;
 
-final class SiteTreeMovementDataProcessor extends SiteTreeDataProcessor
+class SiteTreeMovementDataProcessor extends SiteTreeDataProcessor
 {
     public const UP = 'up';
     public const DOWN = 'down';

@@ -11,7 +11,7 @@ use WhiteDigital\EntityResourceMapper\Resource\BaseResource;
 use WhiteDigital\SiteTree\Api\Resource\MenuItemResource;
 use WhiteDigital\SiteTree\Entity\MenuItem;
 
-final class MenuItemDataProcessor extends AbstractDataProcessor
+class MenuItemDataProcessor extends AbstractDataProcessor
 {
     public function getEntityClass(): string
     {

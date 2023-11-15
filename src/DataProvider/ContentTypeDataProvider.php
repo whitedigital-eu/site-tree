@@ -25,7 +25,7 @@ use WhiteDigital\SiteTree\Entity\SiteTree;
 use function array_key_exists;
 use function array_merge;
 
-final readonly class ContentTypeDataProvider implements ProviderInterface
+readonly class ContentTypeDataProvider implements ProviderInterface
 {
     public function __construct(
         private ParameterBagInterface $bag,
