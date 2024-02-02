@@ -76,12 +76,6 @@ class SitemapController extends AbstractController
             } catch (DBALException) {
                 continue;
             }
-            if ($root === $slug) {
-                $entries[$i++] = [
-                    'loc' => str_replace($fakePath, '', $router->generate('sitemap_gen', referenceType: UrlGeneratorInterface::ABSOLUTE_URL)),
-                    'lastmod' => $now->format(DateTimeInterface::ATOM),
-                ];
-            }
             $entries[$i++] = [
                 'loc' => $path = str_replace($fakePath, '', $router->generate('sitemap_gen', ['path' => $slug], UrlGeneratorInterface::ABSOLUTE_URL)),
                 'lastmod' => $now->format(DateTimeInterface::ATOM),
