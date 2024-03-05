@@ -72,10 +72,15 @@ readonly class ContentTypeFinder implements ContentTypeFinderInterface
             $entity = $types[$found->getType()]['entity'] ?? null;
 
             if (null !== $entity) {
-                $item = $this->em->getRepository($entity)->findOneBySlug($end);
-
-                if (null !== $item) {
-                    return $item;
+                foreach ($this->bag->get('whitedigital.site_tree.types') as $type) {
+                    $items = $this->em->getRepository($type['entity'])->findBy(['node' => $found]);
+                    if ([] !== $items) {
+                        foreach ($items as $item) {
+                            if ($item->getSlug() === $end) {
+                                return $item;
+                            }
+                        }
+                    }
                 }
             }
 
