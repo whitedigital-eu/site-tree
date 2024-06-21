@@ -12,6 +12,7 @@
     "license": "MIT",
     "require": {
         "php": ">=8.2.0",
+        "ext-dom": "*",
         "api-platform/core": "^3",
         "doctrine/collections": "*",
         "doctrine/dbal": "*",
@@ -24,6 +25,7 @@
         "symfony/framework-bundle": "^6.3",
         "symfony/http-foundation": "^6.3",
         "symfony/http-kernel": "^6.3",
+        "symfony/property-access": "^6.3",
         "symfony/property-info": "^6.3",
         "symfony/routing": "^6.3",
         "symfony/serializer": "^6.3",
