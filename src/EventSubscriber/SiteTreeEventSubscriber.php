@@ -3,6 +3,8 @@
 namespace WhiteDigital\SiteTree\EventSubscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
+use DOMDocument;
+use DOMException;
 use Exception;
 use LogicException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -14,11 +16,14 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use WhiteDigital\EntityResourceMapper\Entity\BaseEntity;
 use WhiteDigital\SiteTree\Contracts\ContentTypeFinderInterface;
 use WhiteDigital\SiteTree\Entity\Redirect;
 use WhiteDigital\SiteTree\Entity\SiteTree;
@@ -47,6 +52,8 @@ readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         '/_profiler',
     ];
 
+    private PropertyAccessorInterface $propertyAccessor;
+
     public function __construct(
         private Environment $twig,
         private EntityManagerInterface $em,
@@ -54,7 +61,9 @@ readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         private ParameterBagInterface $bag,
         private TranslatorInterface $translator,
         private ContentTypeFinderInterface $finder,
-    ) {}
+    ) {
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -142,6 +151,14 @@ readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
 
         try {
             $view = $this->twig->render($this->bag->get('whitedigital.site_tree.index_template'));
+            if (null !== $found) {
+                if (null !== ($title = $this->getTitle($found))) {
+                    $view = $this->setTag($view, 'title', $title);
+                }
+                if (null !== ($description = $this->getFieldValue($found, 'metaDescription'))) {
+                    $view = $this->setMeta($view, 'description', $description);
+                }
+            }
             $response->setContent($view);
         } catch (Exception) {
             $response = new Response(status: Response::HTTP_NOT_FOUND);
@@ -180,5 +197,104 @@ readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
         } catch (MethodNotAllowedException $e) {
             throw $this->getException($request, $e);
         }
+    }
+
+    private function getTitle(?BaseEntity $entity): ?string
+    {
+        $metaTitle = $this->getFieldValue($entity, 'metaTitle');
+        if ($metaTitle) {
+            return $metaTitle;
+        }
+
+        $title = $this->getFieldValue($entity, 'title');
+        if ($title) {
+            return $title;
+        }
+
+        if ($this->propertyAccessor->isReadable($entity, 'node')) {
+            $tree = $this->getFieldValue($entity, 'node');
+
+            return $this->getTreeTitle($tree);
+        }
+
+        return null;
+    }
+
+    private function getTreeTitle(?SiteTree $tree): ?string
+    {
+        $metaTitle = $this->getFieldValue($tree, 'metaTitle');
+        if ($metaTitle) {
+            return $metaTitle;
+        }
+
+        $title = $this->getFieldValue($tree, 'title');
+        if ($title) {
+            return $title;
+        }
+
+        $parent = $this->getFieldValue($tree, 'parent');
+        if ($parent) {
+            return $this->getTreeTitle($parent);
+        }
+
+        return null;
+    }
+
+    private function getFieldValue(?BaseEntity $entity, string $field): mixed
+    {
+        if ($this->propertyAccessor->isReadable($entity, $field)) {
+            return $this->propertyAccessor->getValue($entity, $field);
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function setTag(string $htmlContent, string $tagName, string $value): string
+    {
+        $dom = new DOMDocument();
+        @$dom->loadHTML($htmlContent);
+        $head = $dom->getElementsByTagName('head')->item(0);
+
+        $tags = $dom->getElementsByTagName($tagName);
+        if ($tags->length > 0) {
+            $tags->item(0)->nodeValue = $value;
+        } else {
+            $tag = $dom->createElement($tagName, $value);
+            $head?->appendChild($tag);
+        }
+
+        return $dom->saveHTML();
+    }
+
+    /**
+     * @throws DOMException
+     */
+    private function setMeta(string $htmlContent, string $name, string $content): string
+    {
+        $dom = new DOMDocument();
+        @$dom->loadHTML($htmlContent);
+        $head = $dom->getElementsByTagName('head')->item(0);
+
+        $metaTags = $dom->getElementsByTagName('meta');
+        $metaFound = false;
+        foreach ($metaTags as $metaTag) {
+            if ($metaTag->getAttribute('name') === $name) {
+                $metaTag->setAttribute('content', $content);
+                $metaFound = true;
+                break;
+            }
+        }
+
+        if (!$metaFound) {
+            $metaTag = $dom->createElement('meta');
+            $metaTag->setAttribute('name', $name);
+            $metaTag->setAttribute('content', $content);
+            $head?->appendChild($metaTag);
+        }
+
+        return $dom->saveHTML();
     }
 }
