@@ -149,7 +149,11 @@ class SiteTreeResource extends BaseResource
     public const PREFIX = 'site_tree:';
     public const MOVE = self::PREFIX . 'move';
 
-    #[ApiProperty(identifier: true)]
+    #[ApiProperty(
+        required: true,
+        identifier: true,
+        openapiContext: ['type' => 'integer'],
+    )]
     #[Groups([self::READ, ])]
     public mixed $id = null;
 

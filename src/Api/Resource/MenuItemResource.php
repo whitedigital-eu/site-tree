@@ -67,7 +67,11 @@ class MenuItemResource extends BaseResource
     private const READ = self::PREFIX . 'read'; // menu_item:read
     private const WRITE = self::PREFIX . 'write'; // menu_item:write
 
-    #[ApiProperty(identifier: true)]
+    #[ApiProperty(
+        required: true,
+        identifier: true,
+        openapiContext: ['type' => 'integer'],
+    )]
     #[Groups([self::READ, ])]
     public mixed $id = null;
 

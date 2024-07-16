@@ -61,7 +61,11 @@ class HtmlResource extends BaseResource
 
     public const PREFIX = 'html:';
 
-    #[ApiProperty(identifier: true)]
+    #[ApiProperty(
+        required: true,
+        identifier: true,
+        openapiContext: ['type' => 'integer'],
+    )]
     #[Groups([self::READ, ])]
     public mixed $id = null;
 
