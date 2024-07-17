@@ -158,21 +158,25 @@ class SiteTreeResource extends BaseResource
     public mixed $id = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
-    #[ApiProperty(openapiContext: ['example' => '/api/site_trees/1', ])]
+    #[ApiProperty(required: true, openapiContext: ['example' => '/api/site_trees/1', ])]
     public ?self $root = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
+    #[ApiProperty(required: true, schema: ['type' => 'integer', ])]
     public ?int $level = null;
 
     #[Groups([self::READ, ])]
+    #[ApiProperty(required: true, schema: ['type' => 'integer', ])]
     public ?int $left = null;
 
     public ?int $right = null;
 
     #[Groups([self::READ, self::PATCH, ])]
+    #[ApiProperty(required: true, schema: ['type' => 'boolean', ])]
     public bool $isActive = false;
 
     #[Groups([self::READ, self::PATCH, ])]
+    #[ApiProperty(required: true, schema: ['type' => 'boolean', ])]
     public bool $isVisible = true;
 
     #[Groups([self::WRITE, self::PATCH, ])]
@@ -181,26 +185,31 @@ class SiteTreeResource extends BaseResource
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[Assert\NotBlank]
+    #[ApiProperty(required: true, schema: ['type' => 'string', ])]
     public ?string $title = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[Assert\NotNull]
+    #[ApiProperty(required: true, schema: ['type' => 'string', ])]
     public ?string $slug = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
+    #[ApiProperty(required: true, schema: ['type' => 'string', ])]
     public ?string $metaTitle = null;
 
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
+    #[ApiProperty(required: true, schema: ['type' => 'string', ])]
     public ?string $metaDescription = null;
 
     #[Groups([self::READ, self::WRITE, ])]
     #[AllowedType]
     #[Assert\NotBlank]
+    #[ApiProperty(required: true, schema: ['type' => 'string', ])]
     public ?string $type = null;
 
     /** @var self[]|null */
     #[Groups([self::READ, self::WRITE, self::PATCH, ])]
     #[SkipCircularReferenceCheck]
-    #[ApiProperty(openapiContext: ['example' => ['/api/site_trees/1'], ])]
+    #[ApiProperty(required: true, openapiContext: ['example' => ['/api/site_trees/1'], ])]
     public ?array $children = null;
 }
