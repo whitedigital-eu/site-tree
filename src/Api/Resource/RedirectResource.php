@@ -63,7 +63,11 @@ class RedirectResource extends BaseResource
 
     public const PREFIX = 'redirect:';
 
-    #[ApiProperty(identifier: true)]
+    #[ApiProperty(
+        required: true,
+        identifier: true,
+        openapiContext: ['type' => 'integer'],
+    )]
     #[Groups([self::READ, ])]
     public mixed $id = null;
 
