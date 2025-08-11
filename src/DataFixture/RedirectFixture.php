@@ -7,19 +7,20 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use WhiteDigital\SiteTree\Entity\Redirect;
 
+use WhiteDigital\SiteTree\Entity\SiteTree;
 use function array_rand;
 
 class RedirectFixture extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        $node = $this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html']));
+        $node = $this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html']), SiteTree::class);
         for ($i = 0; $i < 10; $i++) {
             /** @noinspection PhpParamsInspection */
             $fixture = (new Redirect())
                 ->setCode(307)
                 ->setContent($node->getSlug())
-                ->setNode($this->getReference('noderedirect' . $this->randomArrayKey(SiteTreeFixture::$references['redirect'])));
+                ->setNode($this->getReference('noderedirect' . $this->randomArrayKey(SiteTreeFixture::$references['redirect']), SiteTree::class));
 
             $manager->persist($fixture);
         }

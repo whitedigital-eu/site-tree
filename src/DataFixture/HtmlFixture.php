@@ -9,6 +9,7 @@ use Faker\Factory;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WhiteDigital\SiteTree\Entity\Html;
 
+use WhiteDigital\SiteTree\Entity\SiteTree;
 use function array_rand;
 
 class HtmlFixture extends Fixture implements DependentFixtureInterface
@@ -31,7 +32,7 @@ class HtmlFixture extends Fixture implements DependentFixtureInterface
             /** @noinspection PhpParamsInspection */
             $fixture = (new Html())
                 ->setContent($factory->randomHtml())
-                ->setNode($this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html'])))
+                ->setNode($this->getReference('nodehtml' . $this->randomArrayKey(SiteTreeFixture::$references['html']), SiteTree::class))
                 ->setSlug($factory->words(1, true));
 
             $manager->persist($fixture);
