@@ -159,6 +159,10 @@ readonly class SiteTreeEventSubscriber implements EventSubscriberInterface
                     $view = $this->setMeta($view, 'description', $description);
                 }
             }
+            $domain = $this->bag->get('whitedigital.site_tree.domain');
+            if (null !== $domain) {
+                $view = str_replace('%%DOMAIN%%', $domain, $view);
+            }
             $response->setContent($view);
         } catch (Exception) {
             $response = new Response(status: Response::HTTP_NOT_FOUND);
